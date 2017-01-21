@@ -35,9 +35,9 @@ public class Bullet : MonoBehaviour
         if (target)
         {
 			//JD: I tested this just to see what it would look like if it went directly at the enemy instead of looping around like yours.
-			//rb.velocity = maxSpeed * (target.transform.position - transform.position).normalized;
+			rb.velocity = maxSpeed * (target.transform.position - transform.position).normalized;
             
-			rb.AddForce(maxSpeed * (target.transform.position - transform.position).normalized - rb.velocity);
+			//rb.AddForce(maxSpeed * (target.transform.position - transform.position).normalized - rb.velocity);
 
             if (timer > timeToDestroy) Destroy(gameObject);
             else timer += Time.deltaTime;
