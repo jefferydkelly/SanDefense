@@ -14,6 +14,11 @@ public class Health : MonoBehaviour {
     private float originalScale;
     private Transform healthBar;
 
+    public float CurHealth
+    {
+        get { return currentHealth; }
+    }
+
 	// Use this for initialization
 	void Start () {
 

@@ -81,10 +81,32 @@ public class Tower : MonoBehaviour
         switch (attackStyle)
         {
             case AttackStyle.AttackLowest:
+
+                //refreshes target
                 target = null;
+                float lowestHealth = float.MaxValue;
+
+                //searches for target with lowest health
+                foreach (GameObject enemy in enemies)
+                {
+                    if (enemy)
+                    {
+                        Vector3 dist = enemy.transform.position - transform.position;
+                        dist.y = 0;
+
+                        if (dist.sqrMagnitude < radiusSqr && dist.magnitude < radius &&
+                            enemy.GetComponent<Health>().CurHealth < lowestHealth)
+                        {
+                            target = enemy;
+                            lowestHealth = enemy.GetComponent<Health>().CurHealth;
+                        }
+                    }
+                }
                 break;
 
             case AttackStyle.AttackFurthest:
+
+                //refreshes target
                 target = null;
                 float furthestDist = 0;
 
@@ -95,7 +117,6 @@ public class Tower : MonoBehaviour
                     if (enemy)
                     {
                         Vector3 dist = enemy.transform.position - transform.position;
-
                         dist.y = 0;
 
                         //print(dist.magnitude + " " + radius);
@@ -113,26 +134,42 @@ public class Tower : MonoBehaviour
                         }
                     }
                 }
-                break;
-            case AttackStyle.AttackFirstEnemy:
 
-                //breaks if already havew target
-                if (target) break;
+                break;
+
+            case AttackStyle.AttackFirstEnemy:
+                if (target)
+                {
+                    //checks if target is still in range
+                    Vector3 dist = target.transform.position - transform.position;
+                    dist.y = 0;
+
+                    //if in range break out of switch
+                    if (dist.sqrMagnitude < radiusSqr && dist.magnitude < radius)
+                        break;
+                    else target = null; //resets target and search for new one
+                }
+
+                //search for a new target
                 foreach (GameObject enemy in enemies)
                 {
                     //check if enemy is dead
                     if (enemy)
                     {
                         Vector3 dist = enemy.transform.position - transform.position;
+                        dist.y = 0;
 
                         if (dist.sqrMagnitude < radiusSqr && dist.magnitude < radius)
                         {
-
+                            target = enemy;
+                            break;
                         }
                         else continue;
                     }
                 }
+
                 break;
+
         }
     }
 
@@ -145,7 +182,7 @@ public class Tower : MonoBehaviour
         if (shootStyle == ShootStyle.Lob)
         {
             targetForward = (targetForward + Vector3.up).normalized;
-        } 
+        }
     }
 
     /// <summary>
