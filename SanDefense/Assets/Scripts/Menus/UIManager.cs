@@ -34,7 +34,9 @@ public class UIManager : MonoBehaviour {
 			gameState = value;
 
 			game.SetActive(gameState == GameStates.Game);
-
+			if (gameState == GameStates.Game) {
+				GameManager.Instance.StartGame ();
+			}
 			difficulty.SetActive(gameState == GameStates.Difficulty);
 
 			mainMenu.SetActive(gameState == GameStates.MainMenu);

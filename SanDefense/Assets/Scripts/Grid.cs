@@ -80,6 +80,7 @@ public class Grid : MonoBehaviour {
 		directions.Add (new Vector3 (-1, 0, 0));
 		directions.Add (new Vector3 (0, 0, -1));
 		//cancelButton.SetActive (false);
+		ClickState = ClickStates.None;
 	}
 
 	// Update is called once per frame
@@ -87,14 +88,14 @@ public class Grid : MonoBehaviour {
 
 		if (clickState != ClickStates.None) {
 			Vector3 mousePosition = Input.mousePosition;
-			mousePosition.z = 10;
+			mousePosition.z = Camera.main.transform.position.y;
 			mousePosition = Camera.main.ScreenToWorldPoint (mousePosition);
-			mousePosition.y = 10;
+			mousePosition.y = Camera.main.transform.position.y;
 
 			RaycastHit hit;
 
 			if (clickState == ClickStates.BuildTurret || clickState == ClickStates.BuildWall) {
-				if (Physics.Raycast (mousePosition, Vector3.down, out hit, 10, 1 << LayerMask.NameToLayer ("Tiles"))) {
+				if (Physics.Raycast (mousePosition, Vector3.down, out hit, Camera.main.transform.position.y, 1 << LayerMask.NameToLayer ("Tiles"))) {
 					if (hit.collider.gameObject != selectedTile) {
 						if (selectedTile != null) {
 							selectedTile.Selected = false;
