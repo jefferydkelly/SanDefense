@@ -7,11 +7,13 @@ public class Grid : MonoBehaviour {
 
 	public Vector2 gridSize = new Vector2(10, 10);
 	public GameObject tilePrefab;
-	GameObject selectedTile;
+	Tile selectedTile;
+
 
 	// Use this for initialization
 	void Start () {
 		int tileNum = 1;
+
 		for (int i = 0; i < gridSize.x; i++) {
 			for (int j = 0; j < gridSize.y; j++) {
 				GameObject tile = Instantiate (tilePrefab);
@@ -24,6 +26,7 @@ public class Grid : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+
 		Vector3 mousePosition = Input.mousePosition;
 		mousePosition.z = 10;
 		mousePosition = Camera.main.ScreenToWorldPoint (mousePosition);
@@ -34,15 +37,24 @@ public class Grid : MonoBehaviour {
 		if (Physics.Raycast (mousePosition, Vector3.down, out hit, 10, 1 << LayerMask.NameToLayer("Tiles"))) {
 			if (hit.collider.gameObject != selectedTile) {
 				if (selectedTile != null) {
-					selectedTile.GetComponent<Renderer> ().material.color = Color.white;
+					selectedTile.Selected = false;
 				}
-				selectedTile = hit.collider.gameObject;
-				selectedTile.GetComponent<Renderer> ().material.color = Color.cyan;
-			} 
+				selectedTile = hit.collider.GetComponent<Tile> ();
+				selectedTile.Selected = true;
+			}
+
+			if (Input.GetMouseButtonDown (0)) {
+				
+				if (!selectedTile.Occupied) {
+					//Place down a tower
+				}
+			}
 
 		} else if (selectedTile != null) {
-			selectedTile.GetComponent<Renderer> ().material.color = Color.white;
+			selectedTile.Selected = false;
 		}
 
 	}
+
+
 }

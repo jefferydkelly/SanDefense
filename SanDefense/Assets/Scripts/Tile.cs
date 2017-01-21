@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class Tile : MonoBehaviour {
 	GameObject occupant;
+	Renderer myRenderer;
 	// Use this for initialization
 	void Start () {
-		
+		myRenderer = GetComponent<Renderer> ();
 	}
 	
 	// Update is called once per frame
@@ -31,6 +32,21 @@ public class Tile : MonoBehaviour {
 	public GameObject Occupant {
 		get {
 			return occupant;
+		}
+
+		set {
+			occupant = value;
+			occupant.transform.position = transform.position;
+		}
+	}
+
+	/// <summary>
+	/// Sets a value indicating whether this <see cref="Tile"/> is selected.
+	/// </summary>
+	/// <value><c>true</c> if selected; otherwise, <c>false</c>.</value>
+	public bool Selected {
+		set {
+			myRenderer.material.color = value ? Color.cyan : Color.white;
 		}
 	}
 }
