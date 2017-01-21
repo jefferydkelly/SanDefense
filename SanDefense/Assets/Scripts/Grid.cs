@@ -207,6 +207,8 @@ public class Grid : MonoBehaviour {
 		foreach (Movement m in enemyHolder.GetComponentsInChildren<Movement>()) {
 			Destroy (m.gameObject);
 		}
+
+		StopCoroutine (spawnRoutine);
 	}
 	public List<Tile> CalcPathToCastle(Vector3 startPos) {
 		Vector3 gridPos = startPos - startPosition;
