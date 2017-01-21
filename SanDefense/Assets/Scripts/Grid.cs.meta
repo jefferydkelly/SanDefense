@@ -1,10 +1,19 @@
 fileFormatVersion: 2
 guid: febef97ddbda84053991343896d2bd05
-timeCreated: 1484959034
-licenseType: Free
+timeCreated: 1485035063
+licenseType: Pro
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - tilePrefab: {instanceID: 0}
+  - spawnPrefab: {instanceID: 0}
+  - towerPrefab: {fileID: 1295437180090054, guid: 05bf2acba4a1990459de56f304a510e1,
+      type: 2}
+  - wallPrefab: {instanceID: 0}
+  - buildButton: {instanceID: 0}
+  - destroyButton: {instanceID: 0}
+  - upgradeButton: {instanceID: 0}
+  - cancelButton: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
