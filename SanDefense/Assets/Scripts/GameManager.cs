@@ -7,7 +7,8 @@ public class GameManager : MonoBehaviour {
 	private static GameManager instance = null;
 	bool paused = false;
 	int curCastleHP = 0;
-	[SerializeField]
+    public int moneyAmount = 100;
+    [SerializeField]
 	int maxCastleHP;
 	int waveNumber;
 	WaveState waveState;
@@ -76,6 +77,8 @@ public class GameManager : MonoBehaviour {
 				UIManager.Instance.SetGameState ("Pause");
 			}
 		}
+
+        moneyText.text = moneyAmount.ToString();
 	}
 	void StartWave() {
 		
@@ -139,6 +142,16 @@ public class GameManager : MonoBehaviour {
 		StopCoroutine (currentCoroutine);
 		UIManager.Instance.SetGameState ("Game");
 	}
+
+    public void buildTower(int price)
+    {
+        moneyAmount -= price;
+    }
+
+    public void refundTower(int price)
+    {
+        moneyAmount += price;
+    }
 }
 
 public enum WaveState {
