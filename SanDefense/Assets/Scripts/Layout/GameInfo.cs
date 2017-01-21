@@ -40,15 +40,6 @@ public class GameInfo : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-
-        if(timer > 100)
-        {
-            timer = 0;
-            takeDamage(1);
-        }
-
-        timer++;
-
         //healthDisplay.text = currentHealth + " / " + maxCastleHealth;
         waveDisplay.text = "\t" + currentWave + " / " + maxWaves;
         moneyDisplay.text = "\t" + currentMoney;
