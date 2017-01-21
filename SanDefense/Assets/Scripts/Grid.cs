@@ -115,6 +115,8 @@ public class Grid : MonoBehaviour {
 								selectedTile.Occupant.transform.parent = towerHolder.transform;
 
 								numTurrets++;
+
+                                GameManager.Instance.funds(-25);
 							}
 								selectedTile.Selected = false;
 								selectedTile = null;
@@ -329,7 +331,11 @@ public class Grid : MonoBehaviour {
 	}
 
 	public void SetClickState(string cs) {
-		ClickState = (ClickStates)System.Enum.Parse (typeof(ClickStates), cs);
+
+        if (cs == "BuildTurret" && GameManager.Instance.moneyAmount >= 25)
+        {
+            ClickState = (ClickStates)System.Enum.Parse(typeof(ClickStates), cs);
+        }
 	}
 
 	ClickStates ClickState {

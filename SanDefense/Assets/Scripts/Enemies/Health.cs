@@ -62,6 +62,7 @@ public class Health : MonoBehaviour {
 		{
             Instantiate(SandDollar, transform.position, Quaternion.identity);
 			EnemyManager.Instance.Enemies.Remove (gameObject);
+            GameManager.Instance.funds(3);
 			Destroy(gameObject);
 		}
     }
