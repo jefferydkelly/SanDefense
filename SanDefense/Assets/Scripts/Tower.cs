@@ -14,8 +14,9 @@ public class Tower : MonoBehaviour
     public GameObject bullet; //prefab of bullet to 
     public GameObject turretHead; //this turns and shoot, if none use the game object this is attached to to turn
     public AttackStyle attackStyle = AttackStyle.AttackLowest; //ai attack style
+    public float attackCooldown = 1;
 
-    [Range(3,20)]
+    [Range(3, 20)]
     public float radius = 5;
     private float radiusSqr = 25;
 
@@ -23,6 +24,7 @@ public class Tower : MonoBehaviour
     private Transform head;
     private GameObject[] enemies;
     private GameObject target;
+    private float timer = 0;
 
 
     // Use this for initialization
@@ -43,6 +45,7 @@ public class Tower : MonoBehaviour
     void Update()
     {
         enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        //print(enemies[0]);
 
         switch (attackStyle)
         {
@@ -51,6 +54,7 @@ public class Tower : MonoBehaviour
                 break;
             case AttackStyle.AttackFurthest:
                 target = null;
+                float furthestDist = 0;
 
                 //loops through all enemies
                 foreach (GameObject enemy in enemies)
@@ -59,14 +63,19 @@ public class Tower : MonoBehaviour
                     if (enemy)
                     {
                         Vector3 dist = enemy.transform.position - transform.position;
-                        float furthestDist = float.MinValue;
+
+                        dist.y = 0;
+
+                        //print(dist.magnitude + " " + radius);
+                        //print(dist.magnitude > furthestDist);
 
                         //checks if in radius and if further than current max
-                        if (dist.sqrMagnitude < radiusSqr && 
-                            dist.magnitude < radius && 
-                            dist.sqrMagnitude > Mathf.Pow(furthestDist,2) &&
+                        if (dist.sqrMagnitude < radiusSqr &&
+                            dist.magnitude < radius &&
+                            dist.sqrMagnitude > Mathf.Pow(furthestDist, 2) &&
                             dist.magnitude > furthestDist)
                         {
+                            print("Targeting: " + enemy.gameObject.name + " " + furthestDist);
                             target = enemy;
                             furthestDist = dist.magnitude;
                         }
@@ -76,7 +85,7 @@ public class Tower : MonoBehaviour
             case AttackStyle.AttackFirstEnemy:
                 //breaks 
                 if (target) break;
-                foreach(GameObject enemy in enemies)
+                foreach (GameObject enemy in enemies)
                 {
                     //check if enemy is dead
                     if (enemy)
@@ -93,15 +102,25 @@ public class Tower : MonoBehaviour
                 break;
         }
 
+
+
         if (target)
         {
             head.forward = (target.transform.position - transform.position).normalized;
-            Instantiate(bullet, transform.position, head.transform.rotation, transform);
+
+            if (timer > attackCooldown)
+            {
+                Bullet bul = (Instantiate(bullet, transform.position, head.transform.rotation, transform)).GetComponent<Bullet>();
+                bul.Initialize(target);
+                timer = 0;
+            }
         }
+
+        timer += Time.deltaTime;
     }
 
     //for visualizing radius
-    void OnDrawGizmosSelected()
+    void OnDrawGizmos()
     {
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, radius);
