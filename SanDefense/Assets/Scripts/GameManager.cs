@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour {
     [SerializeField]
 	int maxCastleHP;
 	int waveNumber;
+    public int maxWaveNumber;
 	WaveState waveState;
 	ImageBoxWithBackground msgBox;
 	public Slider castleHealthDisplay;
@@ -33,7 +34,8 @@ public class GameManager : MonoBehaviour {
 			msgBox.Enabled = false;
 			hpText = castleHealthDisplay.GetComponentInChildren<Text>();
 			waveText = waveDisplay.GetComponentInChildren<Text> ();
-			startWaveDelegate = () => {
+
+            startWaveDelegate = () => {
 				StartWave ();
 			};
 			endWaveDelegate = () => {
@@ -52,9 +54,11 @@ public class GameManager : MonoBehaviour {
 			gameRunning = true;
 			paused = false;
 			curCastleHP = maxCastleHP;
-			waveNumber = 0;
+			waveNumber = 1;
 
-			castleHealthDisplay.maxValue = maxCastleHP;
+            waveDisplay.value = waveNumber;
+
+            castleHealthDisplay.maxValue = maxCastleHP;
 
 
 			hpText.text = maxCastleHP + " / " + maxCastleHP;
@@ -79,6 +83,7 @@ public class GameManager : MonoBehaviour {
 		}
 
         moneyText.text = "\t" + moneyAmount.ToString();
+        waveText.text = "\t" + waveNumber + " / " + maxWaveNumber;
 	}
 	void StartWave() {
 		
