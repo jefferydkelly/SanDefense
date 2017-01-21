@@ -11,11 +11,27 @@ public class Tower : MonoBehaviour
         AttackLowest,
     };
 
+    public enum ShootStyle
+    {
+        Straight,
+        Lob,
+    };
+
     public GameObject bullet; //prefab of bullet to 
     public GameObject turretHead; //this turns and shoot, if none use the game object this is attached to to turn
-    public AttackStyle attackStyle = AttackStyle.AttackLowest; //ai attack style
+    public AttackStyle attackStyle = AttackStyle.AttackLowest; //algorithm to determine the target
+    public ShootStyle shootStyle = ShootStyle.Straight;
 
-    [Range(3,20)]
+    [Range(0, 500)]
+    public float damage = 20;
+
+    [Range(0, 3)]
+    public float attackCooldown = 1;
+
+    [Range(0.5f,10)]
+    public float bulletSpeed = 2;
+
+    [Range(3, 20)]
     public float radius = 5;
     private float radiusSqr = 25;
 
@@ -23,6 +39,8 @@ public class Tower : MonoBehaviour
     private Transform head;
     private GameObject[] enemies;
     private GameObject target;
+    private float timer = 0;
+    private Vector3 targetForward;
 
 
     // Use this for initialization
@@ -43,14 +61,32 @@ public class Tower : MonoBehaviour
     void Update()
     {
         enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        DetermineTarget();
 
+        targetForward = head.forward;
+
+        if (target)
+        {
+            DetermineDirection();
+            Shoot();
+        }
+
+
+        head.forward = Vector3.Lerp(head.forward, targetForward, .5f);
+        timer += Time.deltaTime;
+    }
+
+    void DetermineTarget()
+    {
         switch (attackStyle)
         {
             case AttackStyle.AttackLowest:
                 target = null;
                 break;
+
             case AttackStyle.AttackFurthest:
                 target = null;
+                float furthestDist = 0;
 
                 //loops through all enemies
                 foreach (GameObject enemy in enemies)
@@ -59,14 +95,19 @@ public class Tower : MonoBehaviour
                     if (enemy)
                     {
                         Vector3 dist = enemy.transform.position - transform.position;
-                        float furthestDist = float.MinValue;
+
+                        dist.y = 0;
+
+                        //print(dist.magnitude + " " + radius);
+                        //print(dist.magnitude > furthestDist);
 
                         //checks if in radius and if further than current max
-                        if (dist.sqrMagnitude < radiusSqr && 
-                            dist.magnitude < radius && 
-                            dist.sqrMagnitude > Mathf.Pow(furthestDist,2) &&
+                        if (dist.sqrMagnitude < radiusSqr &&
+                            dist.magnitude < radius &&
+                            dist.sqrMagnitude > Mathf.Pow(furthestDist, 2) &&
                             dist.magnitude > furthestDist)
                         {
+                            //print("Targeting: " + enemy.gameObject.name + " " + furthestDist);
                             target = enemy;
                             furthestDist = dist.magnitude;
                         }
@@ -74,9 +115,10 @@ public class Tower : MonoBehaviour
                 }
                 break;
             case AttackStyle.AttackFirstEnemy:
-                //breaks 
+
+                //breaks if already havew target
                 if (target) break;
-                foreach(GameObject enemy in enemies)
+                foreach (GameObject enemy in enemies)
                 {
                     //check if enemy is dead
                     if (enemy)
@@ -92,16 +134,35 @@ public class Tower : MonoBehaviour
                 }
                 break;
         }
+    }
 
-        if (target)
+    /// <summary>
+    /// Determines direction based on where the enemy is
+    /// </summary>
+    void DetermineDirection()
+    {
+        targetForward = (target.transform.position - transform.position).normalized;
+        if (shootStyle == ShootStyle.Lob)
         {
-            head.forward = (target.transform.position - transform.position).normalized;
-            Instantiate(bullet, transform.position, head.transform.rotation, transform);
+            targetForward = (targetForward + Vector3.up).normalized;
+        } 
+    }
+
+    /// <summary>
+    /// Checks the cooldown and shoots at the enemy
+    /// </summary>
+    void Shoot()
+    {
+        if (timer > attackCooldown)
+        {
+            Bullet bul = (Instantiate(bullet, head.transform.position, head.transform.rotation, transform)).GetComponent<Bullet>();
+            bul.Initialize(target, bulletSpeed, damage);
+            timer = 0;
         }
     }
 
     //for visualizing radius
-    void OnDrawGizmosSelected()
+    void OnDrawGizmos()
     {
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, radius);
