@@ -43,6 +43,8 @@ public class Grid : MonoBehaviour {
 	GameObject enemyHolder;
 	// Use this for initialization
 	ClickStates clickState = ClickStates.None;
+	WaitDelegate spawnDelegate;
+	Coroutine spawnRoutine;
 	void Start () {
 		instance = this;
 		int tileNum = 1;
@@ -67,6 +69,9 @@ public class Grid : MonoBehaviour {
 			spawnTiles.Add (spawn);
 			spawn.transform.parent = gridHolder.transform;
 			allTiles [i, 0] = spawn.gameObject;
+			spawnDelegate = () => {
+				SpawnEnemy ();
+			};
 		}
 
 		directions = new List<Vector3> ();
@@ -150,14 +155,14 @@ public class Grid : MonoBehaviour {
 	}
 
 	public void StartWave() {
-		InvokeRepeating ("SpawnEnemy", 0.5f, spawnTime);
+		spawnRoutine = StartCoroutine (gameObject.RunAfterRepeating(spawnDelegate, spawnTime));
 	}
 
 	public void EndWave() {
 		foreach (GameObject go in EnemyManager.Instance.Enemies) {
 			Destroy (go);
 		}
-		CancelInvoke ("SpawnEnemy");
+		StopCoroutine (spawnRoutine);
 	}
 
 	/// <summary>

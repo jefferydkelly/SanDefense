@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
 	private static GameManager instance = null;
@@ -10,33 +11,49 @@ public class GameManager : MonoBehaviour {
 	float maxCastleHP;
 	int waveNumber;
 	WaveState waveState;
+	ImageBoxWithBackground msgBox;
+
 	// Use this for initialization
 	void Start () {
 		if (instance == null) {
 			instance = this;
 			curCastleHP = maxCastleHP;
 			waveNumber = 0;
+			msgBox = new ImageBoxWithBackground ("Message");
 			StartSetup ();
 		} else {
 			Destroy (gameObject);
 		}
 	}
 
+	void HideMessage() {
+		msgBox.Enabled = false;
+	}
+
+	void Update() {
+		if (Input.GetKeyDown (KeyCode.P)) {
+			paused = !paused;
+		}
+	}
 	void StartWave() {
-		Debug.Log ("The wave is started");
 		waveState = WaveState.Wave;
+		msgBox.Text = "Wave " + waveNumber + " Start";
+		Invoke ("HideMessage", 5.0f);
 		Grid.TheGrid.StartWave ();
 		Invoke ("EndWave", 15 * (waveNumber + 1));
 	}
 
 	void EndWave() {
-		Debug.Log ("The wave has ended");
 		waveState = WaveState.EndWave;
+		msgBox.Text = "Wave Over";
+		Invoke ("HideMessage", 5.0f);
 		Grid.TheGrid.EndWave ();
 		Invoke ("StartSetup", 30);
 	}
 
 	void StartSetup() {
+		msgBox.Text = "Setup";
+		Invoke ("HideMessage", 5.0f);
 		waveState = WaveState.SetUp;
 		waveNumber++;
 		Invoke ("StartWave", 15);
@@ -62,10 +79,47 @@ public class GameManager : MonoBehaviour {
 			return instance;
 		}
 	}
+
+	public bool IsPaused {
+		get {
+			return paused;
+		}
+	}
 }
 
 public enum WaveState {
 	SetUp,
 	Wave,
 	EndWave
+}
+
+public struct ImageBoxWithBackground {
+	Image img;
+	Text txt;
+	public ImageBoxWithBackground(string name) {
+		img = GameObject.Find (name).GetComponent<Image> ();
+		txt = img.GetComponentInChildren<Text> ();
+	}
+
+	public bool Enabled {
+		get {
+			return img.enabled;
+		}
+
+		set {
+			img.enabled = value;
+			txt.enabled = value;
+		}
+	}
+		
+	public string Text {
+		get {
+			return txt.text;
+		}
+
+		set {
+			txt.text = value;
+			Enabled = true;
+		}
+	}
 }

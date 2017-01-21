@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public delegate void WaitDelegate();
 public static class ExtensionMethods {
 
 	/// <summary>
@@ -45,5 +46,36 @@ public static class ExtensionMethods {
 		float vx = v.x * cos - v.y * sin;
 		float vy = v.y * cos + v.x * sin;
 		return new Vector2 (vx, vy);
+	}
+
+	public static IEnumerator RunAfter(this GameObject go, WaitDelegate w, float time)
+	{
+		float dt = 0;
+		Debug.Log (dt);
+		while (dt < time)
+		{
+			if (!GameManager.Instance.IsPaused)
+			{
+				dt += Time.deltaTime;
+			}
+			yield return null;
+
+		}
+		w();
+	}
+
+	public static IEnumerator RunAfterRepeating(this GameObject go, WaitDelegate w, float time) {
+		float dt = 0;
+		while(true) {
+			do {
+				if (!GameManager.Instance.IsPaused) {
+					dt += Time.deltaTime;
+				}
+				yield return null;
+
+			} while(dt < time);
+			w();
+			dt = 0;
+		}
 	}
 }
