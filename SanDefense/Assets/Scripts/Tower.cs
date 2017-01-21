@@ -53,7 +53,7 @@ public class Tower : MonoBehaviour
             head = turretHead.transform;
         else head = transform;
 
-        enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        enemies = EnemyManager.Instance.Enemies;
 
         radiusSqr = Mathf.Pow(radius, 2);
 		myRenderer = GetComponent<Renderer> ();
@@ -62,7 +62,8 @@ public class Tower : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        enemies = GameObject.FindGameObjectsWithTag("Enemy");
+
+        enemies = EnemyManager.Instance.Enemies;
         DetermineTarget();
 
         targetForward = head.forward;
@@ -70,11 +71,11 @@ public class Tower : MonoBehaviour
         if (target)
         {
             DetermineDirection();
+            head.forward = Vector3.Lerp(head.forward, targetForward, .6f);
             Shoot();
         }
 
 
-        head.forward = Vector3.Lerp(head.forward, targetForward, .5f);
         timer += Time.deltaTime;
     }
 
