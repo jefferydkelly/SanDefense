@@ -2,43 +2,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyManager : MonoBehaviour
+public class EnemyManager
 {
     private static EnemyManager instance;
+	public EnemyManager() {
+		enemies = new List<GameObject> ();
+	}
     public static EnemyManager Instance
     {
         get
         {
-            if (instance)
-                return instance;
-            else
-            {
-                print("Fuck there's no Enemy ManageR");
-                return instance;
-            }
+			if (instance == null)
+				instance = new EnemyManager ();
+            
+			return instance;
         }
     }
 
-    private GameObject[] enemies;
-    public GameObject[] Enemies
+	private List<GameObject> enemies;
+	public List<GameObject> Enemies
     {
         get { return enemies; }
-    }
-
-    void Awake()
-    {
-        instance = this;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        enemies = GameObject.FindGameObjectsWithTag("Enemy");
-    }
-
-    void OnDestroy()
-    {
-        instance = null;
     }
 
 }

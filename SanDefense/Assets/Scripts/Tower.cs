@@ -37,7 +37,7 @@ public class Tower : MonoBehaviour
 
     private BoxCollider boxCollider;
     private Transform head;
-    private GameObject[] enemies;
+ 
     private GameObject target;
     private float timer = 0;
     private Vector3 targetForward;
@@ -54,8 +54,6 @@ public class Tower : MonoBehaviour
             head = turretHead.transform;
         else head = transform;
 
-        enemies = EnemyManager.Instance.Enemies;
-
         radiusSqr = Mathf.Pow(radius, 2);
 		myRenderer = GetComponent<Renderer> ();
 		headRenderer = turretHead.GetComponentInChildren<Renderer> ();
@@ -64,7 +62,6 @@ public class Tower : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        enemies = EnemyManager.Instance.Enemies;
         DetermineTarget();
 
         targetForward = head.forward;
@@ -91,7 +88,7 @@ public class Tower : MonoBehaviour
                 float lowestHealth = float.MaxValue;
 
                 //searches for target with lowest health
-                foreach (GameObject enemy in enemies)
+				foreach (GameObject enemy in EnemyManager.Instance.Enemies)
                 {
                     if (enemy)
                     {
@@ -114,7 +111,7 @@ public class Tower : MonoBehaviour
                 float furthestDist = 0;
 
                 //loops through all enemies
-                foreach (GameObject enemy in enemies)
+				foreach (GameObject enemy in EnemyManager.Instance.Enemies)
                 {
                     //check if enemy is dead
                     if (enemy)
@@ -151,7 +148,7 @@ public class Tower : MonoBehaviour
                 }
 
                 //search for a new target
-                foreach (GameObject enemy in enemies)
+				foreach (GameObject enemy in EnemyManager.Instance.Enemies)
                 {
                     //check if enemy is dead
                     if (enemy)

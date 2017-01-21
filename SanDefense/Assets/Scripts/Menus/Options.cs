@@ -15,12 +15,13 @@ public class Options : MonoBehaviour {
 	}
 
     public void buttonClick(string name) {
-        
-        switch(name)
+
+        //Test if the main menu button is clicked
+        //Set the game state back to the main menu
+        if (name == "mainMenu")
         {
-            case "mainMenu":
-                GetComponentInParent<GameState>().gameState = "mainMenu";
-                break;
+            GetComponentInParent<GameState>().gameState = "mainMenu";
+            return;
         }
     }
 }

@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class Difficulties : MonoBehaviour {
 
+    //The button that is being hovered over
+    //The button that is selected
     public string hover;
     public string selected;
 
@@ -12,25 +14,35 @@ public class Difficulties : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        //Set that no buttons are selected to begin with
         selected = null;
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
+        //Test if there is a button selected
+        //Start the game
+        //Reset the selected to be null
         if (selected != null)
         {
             GetComponentInParent<GameState>().gameState = "game";
             selected = null;
         }
 
-
+        //How many waves of creatures there will be
+        //The multiplier for the amount of money you get
+        //The score multiplier
+        //How many creature waves must happen before a water wave happens
+        //The amount of towers that can be destroyed in a water wave
         int creatureWaves = 0;
         int currencyModifier = 0;
         float scoreBonus = 0;
         int waveFreq = 0;
         int waveDest = 0;
 
+        //Test which difficulty is being hovered over
+        //Display information about the difficulty level
         switch(hover)
         {
             case "Easy":
@@ -56,6 +68,7 @@ public class Difficulties : MonoBehaviour {
                 break;
         }
 
+        //Display the information about the difficulty off to the left
         difficultyInfo.text =
             "Game Difficulty: " + hover + "\n\n" +
             "Currency Bonus: " + currencyModifier + "\n\n" +
@@ -68,6 +81,8 @@ public class Difficulties : MonoBehaviour {
     public void buttonClick(string level)
     {
 
+        //Test if the button clicked is the main menu button
+        //Return to the main menu
         if (level == "mainMenu")
         {
             GetComponentInParent<GameState>().gameState = "mainMenu";
