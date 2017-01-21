@@ -23,13 +23,23 @@ public class PurchaseInfo : MonoBehaviour {
         money = GetComponentInParent<GameInfo>().currentMoney;
     }
 
-    public void purchaseTower()
+    public void buy()
     {
         //Test if the player has enough money to buy the tower
         //Take the price of the tower away from the money the player has
         if (money >= price)
         {
             GetComponentInParent<GameInfo>().currentMoney -= price;
+        }
+    }
+
+    public void refund()
+    {
+        //Test if the player has enough money to buy the tower
+        //Take the price of the tower away from the money the player has
+        if (money >= price)
+        {
+            GetComponentInParent<GameInfo>().currentMoney += price;
         }
     }
 }

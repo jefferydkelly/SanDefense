@@ -13,6 +13,7 @@ public class UIManager : MonoBehaviour {
     public GameObject mainMenu;
     public GameObject options;
     public GameObject credits;
+    public GameObject pause;
 
     // Use this for initialization
     void Start () {
@@ -42,7 +43,8 @@ public class UIManager : MonoBehaviour {
 			mainMenu.SetActive(gameState == GameStates.MainMenu);
 			options.SetActive(gameState == GameStates.Options);
 			credits.SetActive(gameState == GameStates.Credits);
-		}
+            pause.SetActive(gameState == GameStates.Pause);
+        }
 	}
 	public void SetGameState(string s) {
 		GameState = (GameStates)System.Enum.Parse (typeof(GameStates), s);
@@ -58,5 +60,6 @@ public enum GameStates {
 	Difficulty,
 	Game,
 	Options,
-	Credits
+	Credits,
+    Pause
 }
