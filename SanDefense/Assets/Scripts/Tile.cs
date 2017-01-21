@@ -6,7 +6,7 @@ public class Tile : MonoBehaviour {
 	GameObject occupant;
 	Renderer myRenderer;
 	// Use this for initialization
-	void Start () {
+	void Awake () {
 		myRenderer = GetComponent<Renderer> ();
 	}
 	
@@ -37,6 +37,7 @@ public class Tile : MonoBehaviour {
 		set {
 			occupant = value;
 			occupant.transform.position = transform.position;
+			Selected = true;
 		}
 	}
 

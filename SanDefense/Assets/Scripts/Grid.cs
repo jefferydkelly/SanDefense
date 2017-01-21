@@ -26,15 +26,15 @@ public class Grid : MonoBehaviour {
 	void Start () {
 		instance = this;
 		int tileNum = 1;
-		tiles = new Tile[(int)gridSize.y, (int)gridSize.x];
+		tiles = new Tile[(int)gridSize.x, (int)gridSize.y];
 		allTiles = new GameObject[(int)gridSize.x, (int)gridSize.y + 1];
 		for (int i = 0; i < gridSize.y; i++) {
 			for (int j = 0; j < gridSize.x; j++) {
 				GameObject tile = Instantiate (tilePrefab);
-				tile.transform.position = startPosition + new Vector3 (j, 0, i);
+				tile.transform.position = startPosition + new Vector3 (i, 0, j);
 				tile.name = "Tile " + tileNum;
 				tileNum++;
-				tiles[j, i] = tile.GetComponent<Tile>();
+				tiles[i, j] = tile.GetComponent<Tile>();
 				allTiles [i, j+1] = tile;
 			}
 
@@ -117,13 +117,13 @@ public class Grid : MonoBehaviour {
 		Vector3 gridPos = startPos - startPosition;
 		int numTiles = (int)gridSize.x * (int)gridSize.y;
 		Tile start = GetTileAt (startPos);
-		Vector3 dest = new Vector3 (startPos.x, startPos.y, (startPosition.x + gridSize.y) - 1);
+		Vector3 dest = new Vector3 (startPos.x, startPos.y, (startPosition.x + gridSize.y));
 		Tile goal = GetTileAt(dest);
 		List<Tile> closedSet = new List<Tile> ();
 		List<Tile> openSet = new List<Tile> ();
 		openSet.Add (start);
 
-		int curIndex = (int)(gridPos.x * gridSize.x + gridPos.z);
+		int curIndex = (int)(gridPos.z * gridSize.y + gridPos.x);
 		float[] gScore = new float[numTiles];
 		gScore [curIndex] = 0;
 		float[] fScore = new float[numTiles];
@@ -141,15 +141,15 @@ public class Grid : MonoBehaviour {
 		while (!openSet.IsEmpty ()) {
 			openSet.Sort (delegate(Tile x, Tile y) {
 				Vector3 xPos = x.transform.position - startPosition;
-				int xInd = (int)(xPos.x * gridSize.x + xPos.z);
+				int xInd = (int)(xPos.z * gridSize.y + xPos.x);
 				Vector3 yPos = y.transform.position - startPosition;
-				int yInd = (int)(yPos.x * gridSize.x + yPos.z);
+				int yInd = (int)(yPos.z * gridSize.y + yPos.x);
 				return fScore[xInd].CompareTo(fScore[yInd]);
 			});
 
 			Tile current = openSet [0];
 			gridPos = current.transform.position - startPosition;
-			curIndex = (int)(gridPos.x * gridSize.x + gridPos.z);
+			curIndex = (int)(gridPos.z * gridSize.y + gridPos.x);
 			if (Vector3.Equals(current.transform.position, goal.transform.position)) {
 				List<Tile> path = ReconstructPath (cameFrom, current);
 				path.Remove (path [0]);
@@ -160,11 +160,12 @@ public class Grid : MonoBehaviour {
 			closedSet.Add (current);
 
 			foreach (Tile t in GetNeighbors(current)) {
+				
 				if (closedSet.Contains (t)) {
 					continue;
 				}
 				Vector3 newGridPos = t.transform.position - startPosition;
-				int tIndex = (int)(newGridPos.x * gridSize.x + newGridPos.z);
+				int tIndex = (int)(newGridPos.z * gridSize.y + newGridPos.x);
 				float tentativeGScore = gScore [curIndex] + 1;
 
 				if (!openSet.Contains (t)) {
@@ -172,11 +173,16 @@ public class Grid : MonoBehaviour {
 				} else if (tentativeGScore >= gScore [tIndex]) {
 					continue;
 				}
+
 				cameFrom [tIndex] = current;
+
 				gScore [tIndex] = tentativeGScore;
 				fScore[tIndex] = tentativeGScore + Vector3.Distance(current.transform.position, dest);
+
 			}
+
 		}
+
 		Debug.Log ("Fail");
 		return null;
 	}
@@ -200,17 +206,17 @@ public class Grid : MonoBehaviour {
 		List<Tile> totalPath = new List<Tile> ();
 		totalPath.Add (current);
 		Vector3 gridPos = current.transform.position - startPosition;
-		int index = (int)(gridPos.x * gridSize.x + gridPos.z);
-
+		int index = (int)(gridPos.z * gridSize.y + gridPos.x);
+		current.Selected = true;
 
 		while (cameFrom [index] != null) {
-			current.Selected = true;
 			current = cameFrom [index];
+			current.Selected = true;
 			gridPos = current.transform.position - startPosition;
-			index = (int)(gridPos.x * gridSize.x + gridPos.z);
+			index = (int)(gridPos.z * gridSize.y + gridPos.x);
 			totalPath.Add (current);
 		}
-		current.Selected = true;
+
 		totalPath.Reverse ();
 		return totalPath;
 	}
