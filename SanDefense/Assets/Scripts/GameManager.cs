@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour {
 			endWaveDelegate = () => {
 				EndWave ();
 			};
-			startSetupDelegate = () {
+			startSetupDelegate = () => {
 				StartSetup();
 			};
 		} else {
