@@ -12,12 +12,10 @@ public class GameManager : MonoBehaviour {
     [SerializeField]
 	int maxCastleHP;
 	int waveNumber;
-//<<<<<<< HEAD
-    public int maxWaveNumber;
-//=======
+
 	[SerializeField]
 	int maxWaves = 10;
-//>>>>>>> e8dcd4904afb721b255a23d40d9125152f0dbe9a
+
 	WaveState waveState;
 	ImageBoxWithBackground msgBox;
 	public Slider castleHealthDisplay;
@@ -31,6 +29,8 @@ public class GameManager : MonoBehaviour {
 	WaitDelegate startWaveDelegate;
 	WaitDelegate endWaveDelegate;
 	WaitDelegate startSetupDelegate;
+
+	bool won = false;
 
 	// Use this for initialization
 	void Start () {
@@ -50,6 +50,7 @@ public class GameManager : MonoBehaviour {
 			startSetupDelegate = () => {
 				StartSetup();
 			};
+			DontDestroyOnLoad (gameObject);
 		} else {
 			Destroy (gameObject);
 		}
@@ -60,7 +61,7 @@ public class GameManager : MonoBehaviour {
 			gameRunning = true;
 			paused = false;
 			curCastleHP = maxCastleHP;
-			waveNumber = 1;
+			waveNumber = 0;
 
             waveDisplay.value = waveNumber;
 
@@ -87,12 +88,9 @@ public class GameManager : MonoBehaviour {
 				UIManager.Instance.SetGameState ("Pause");
 			}
 		}
-
-        moneyText.text = "\t" + moneyAmount.ToString();
-        waveText.text = "\t" + waveNumber + " / " + maxWaveNumber;
 	}
 	void StartWave() {
-		
+
 		waveState = WaveState.Wave;
 		msgBox.Text = "Wave " + waveNumber + " Start";
 		Invoke ("HideMessage", 2.0f);
@@ -120,6 +118,7 @@ public class GameManager : MonoBehaviour {
 			waveDisplay.value = waveNumber;
 			currentCoroutine = StartCoroutine (gameObject.RunAfter (startWaveDelegate, 15));
 		} else {
+			won = true;
 			SceneManager.LoadScene ("GameOver");
 		}
 
@@ -160,9 +159,15 @@ public class GameManager : MonoBehaviour {
 		UIManager.Instance.SetGameState ("Game");
 	}
 
+	public bool WonGame {
+		get {
+			return won;
+		}
+	}
     public void funds(int price)
     {
         moneyAmount += price;
+		moneyText.text = "\t" + moneyAmount.ToString();
     }
 }
 
@@ -190,7 +195,7 @@ public struct ImageBoxWithBackground {
 			txt.enabled = value;
 		}
 	}
-		
+
 	public string Text {
 		get {
 			return txt.text;
