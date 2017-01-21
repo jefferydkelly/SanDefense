@@ -26,7 +26,7 @@ public class Difficulties : MonoBehaviour {
         //Reset the selected to be null
         if (selected != null)
         {
-            GetComponentInParent<GameState>().gameState = "game";
+			GetComponentInParent<UIManager> ().SetGameState ("Game");
             selected = null;
         }
 
@@ -82,12 +82,6 @@ public class Difficulties : MonoBehaviour {
     {
 
         //Test if the button clicked is the main menu button
-        //Return to the main menu
-        if (level == "mainMenu")
-        {
-            GetComponentInParent<GameState>().gameState = "mainMenu";
-            return;
-        }
 
         //Set the name for which button that was clicked
         selected = level;

@@ -13,25 +13,4 @@ public class MainMenu : MonoBehaviour {
 	void Update () {
 
 	}
-
-    public void buttonClick(string name)
-    {
-        //Test the name of the button that is pressed
-        //Change the game state relative to the button that is pressed
-        switch (name)
-        {
-            case "play":
-                GetComponentInParent<GameState>().gameState = "difficulty";
-                break;
-            case "options":
-                GetComponentInParent<GameState>().gameState = "options";
-                break;
-            case "credits":
-                GetComponentInParent<GameState>().gameState = "credits";
-                break;
-            case "exit":
-                Application.Quit();
-                break;
-        }
-    }
 }

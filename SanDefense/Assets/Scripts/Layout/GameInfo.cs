@@ -23,10 +23,10 @@ public class GameInfo : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        currentHealth = maxCastleHealth;
+        //currentHealth = maxCastleHealth;
 
-        healthSlider.maxValue = maxCastleHealth;
-        healthSlider.value = maxCastleHealth;
+        //healthSlider.maxValue = maxCastleHealth;
+        //healthSlider.value = maxCastleHealth;
 
         waveSlider.maxValue = maxWaves;
         waveSlider.value = currentWave;
@@ -44,11 +44,11 @@ public class GameInfo : MonoBehaviour {
 
         timer++;
 
-        healthDisplay.text = currentHealth + " / " + maxCastleHealth;
+        //healthDisplay.text = currentHealth + " / " + maxCastleHealth;
         waveDisplay.text = "\t" + currentWave + " / " + maxWaves;
         moneyDisplay.text = "\t" + currentMoney;
 
-        healthSlider.value = currentHealth;
+        //healthSlider.value = currentHealth;
         waveSlider.value = currentWave;
     }
 

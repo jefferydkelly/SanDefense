@@ -79,7 +79,7 @@ public class Grid : MonoBehaviour {
 		directions.Add (new Vector3 (0, 0, 1));
 		directions.Add (new Vector3 (-1, 0, 0));
 		directions.Add (new Vector3 (0, 0, -1));
-		cancelButton.SetActive (false);
+		//cancelButton.SetActive (false);
 	}
 
 	// Update is called once per frame

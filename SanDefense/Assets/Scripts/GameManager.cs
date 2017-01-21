@@ -6,12 +6,17 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour {
 	private static GameManager instance = null;
 	bool paused = false;
-	float curCastleHP = 0;
+	int curCastleHP = 0;
 	[SerializeField]
-	float maxCastleHP;
+	int maxCastleHP;
 	int waveNumber;
 	WaveState waveState;
 	ImageBoxWithBackground msgBox;
+	public Slider castleHealthDisplay;
+	Text hpText;
+	public Slider waveDisplay;
+	Text waveText;
+	public Text moneyText;
 
 	// Use this for initialization
 	void Start () {
@@ -19,7 +24,14 @@ public class GameManager : MonoBehaviour {
 			instance = this;
 			curCastleHP = maxCastleHP;
 			waveNumber = 0;
-			msgBox = new ImageBoxWithBackground ("Message");
+			//msgBox = new ImageBoxWithBackground ("Message");
+			//castleHealthDisplay.enabled = true;
+			castleHealthDisplay.maxValue = 100;//maxCastleHP;
+
+			hpText = castleHealthDisplay.GetComponentInChildren<Text>();
+			hpText.text = maxCastleHP + " / " + maxCastleHP;
+
+			waveText = waveDisplay.GetComponentInChildren<Text> ();
 			StartSetup ();
 		} else {
 			Destroy (gameObject);
@@ -27,7 +39,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	void HideMessage() {
-		msgBox.Enabled = false;
+		//msgBox.Enabled = false;
 	}
 
 	void Update() {
@@ -36,8 +48,9 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 	void StartWave() {
+		
 		waveState = WaveState.Wave;
-		msgBox.Text = "Wave " + waveNumber + " Start";
+		//msgBox.Text = "Wave " + waveNumber + " Start";
 		Invoke ("HideMessage", 5.0f);
 		Grid.TheGrid.StartWave ();
 		Invoke ("EndWave", 15 * (waveNumber + 1));
@@ -45,14 +58,16 @@ public class GameManager : MonoBehaviour {
 
 	void EndWave() {
 		waveState = WaveState.EndWave;
-		msgBox.Text = "Wave Over";
+		//msgBox.Text = "Wave Over";
 		Invoke ("HideMessage", 5.0f);
 		Grid.TheGrid.EndWave ();
-		Invoke ("StartSetup", 30);
+		Invoke ("StartSetup", 10);
 	}
 
 	void StartSetup() {
-		msgBox.Text = "Setup";
+		//msgBox.Text = "Setup";
+
+		castleHealthDisplay.value = maxCastleHP;
 		Invoke ("HideMessage", 5.0f);
 		waveState = WaveState.SetUp;
 		waveNumber++;
@@ -62,9 +77,10 @@ public class GameManager : MonoBehaviour {
 	/// Damages the castle.  If Castle HP drops below 0, the game's over.
 	/// </summary>
 	/// <param name="dmg">Dmg.</param>
-	public void DamageCastle(float dmg) {
+	public void DamageCastle(int dmg) {
 		curCastleHP -= dmg;
-	
+		castleHealthDisplay.value = 100;
+		hpText.text = maxCastleHP + " / " + maxCastleHP;
 		if (curCastleHP < 0) {
 			Debug.Log ("Game over, man!  Game over");
 		}

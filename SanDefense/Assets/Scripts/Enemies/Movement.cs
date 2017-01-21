@@ -11,7 +11,7 @@ public class Movement : MonoBehaviour {
 	List<Tile> path;
 	[SerializeField]
 	float atkTime = 1f;
-	float atkDamage = 1f;
+	int atkDamage = 1;
 	// Use this for initialization
 	void Start () {
 		lastTilePos = transform.position;
