@@ -31,7 +31,7 @@ public class Grid : MonoBehaviour {
 
 		RaycastHit hit;
 
-		if (Physics.Raycast (mousePosition, Vector3.down, out hit, 10)) {
+		if (Physics.Raycast (mousePosition, Vector3.down, out hit, 10, 1 << LayerMask.NameToLayer("Tiles"))) {
 			if (hit.collider.gameObject != selectedTile) {
 				if (selectedTile != null) {
 					selectedTile.GetComponent<Renderer> ().material.color = Color.white;
