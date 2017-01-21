@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour {
 	public Slider waveDisplay;
 	Text waveText;
 	public Text moneyText;
+	bool gameRunning = false;
 
 	// Use this for initialization
 	void Start () {
@@ -31,16 +32,22 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void StartGame() {
-		curCastleHP = maxCastleHP;
-		waveNumber = 0;
+		if (!gameRunning) {
+			gameRunning = true;
+			paused = false;
+			curCastleHP = maxCastleHP;
+			waveNumber = 0;
 
-		castleHealthDisplay.maxValue = maxCastleHP;
+			castleHealthDisplay.maxValue = maxCastleHP;
 
 
-		hpText.text = maxCastleHP + " / " + maxCastleHP;
+			hpText.text = maxCastleHP + " / " + maxCastleHP;
 
 
-		StartWave ();
+			StartWave ();
+		} else if (paused) {
+			paused = false;
+		}
 	}
 	void HideMessage() {
 		msgBox.Enabled = false;
@@ -49,6 +56,10 @@ public class GameManager : MonoBehaviour {
 	void Update() {
 		if (Input.GetKeyDown (KeyCode.P)) {
 			paused = !paused;
+
+			if (paused) {
+				UIManager.Instance.SetGameState ("Pause");
+			}
 		}
 	}
 	void StartWave() {
@@ -75,6 +86,7 @@ public class GameManager : MonoBehaviour {
 		Invoke ("HideMessage", 5.0f);
 		waveState = WaveState.SetUp;
 		waveNumber++;
+		waveDisplay.value = waveNumber;
 		Invoke ("StartWave", 15);
 	}
 	/// <summary>
@@ -104,6 +116,24 @@ public class GameManager : MonoBehaviour {
 		get {
 			return paused;
 		}
+	}
+
+	public void RestartGame() {
+		gameRunning = false;
+		Grid.TheGrid.Clear();
+		switch (waveState) {
+
+		case WaveState.SetUp:
+			CancelInvoke ("StartWave");
+			break;
+		case WaveState.Wave:
+			CancelInvoke ("EndWave");
+			break;
+		case WaveState.EndWave:
+			CancelInvoke ("StartSetup");
+			break;
+		}
+		UIManager.Instance.SetGameState ("Game");
 	}
 }
 

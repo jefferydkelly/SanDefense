@@ -199,6 +199,15 @@ public class Grid : MonoBehaviour {
 		}
 	}
 
+	public void Clear() {
+		foreach (Tower t in towerHolder.GetComponentsInChildren<Tower>()) {
+			Destroy (t.gameObject);
+		}
+
+		foreach (Movement m in enemyHolder.GetComponentsInChildren<Movement>()) {
+			Destroy (m.gameObject);
+		}
+	}
 	public List<Tile> CalcPathToCastle(Vector3 startPos) {
 		Vector3 gridPos = startPos - startPosition;
 		int numTiles = (int)gridSize.x * (int)gridSize.y;

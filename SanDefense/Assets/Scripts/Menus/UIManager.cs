@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class UIManager : MonoBehaviour {
 
+	private static UIManager instance;
     //The gamestate that the game is currently in
 	GameStates gameState;
 
@@ -17,8 +18,13 @@ public class UIManager : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        //Start the game at the main menu
-		GameState = GameStates.MainMenu;
+		if (instance == null) {
+			instance = this;
+			//Start the game at the main menu
+			GameState = GameStates.MainMenu;
+		} else {
+			Destroy (gameObject);
+		}
 	}
 	
 	// Update is called once per frame
@@ -52,6 +58,12 @@ public class UIManager : MonoBehaviour {
 
 	public void Quit() {
 		Application.Quit ();
+	}
+
+	public static UIManager Instance {
+		get {
+			return instance;
+		}
 	}
 }
 
