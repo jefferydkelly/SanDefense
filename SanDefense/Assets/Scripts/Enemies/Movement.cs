@@ -8,7 +8,7 @@ public class Movement : MonoBehaviour {
 	public float speed;
 	public Vector3 fwd = new Vector3(0, 0, 1);
 	Vector3 lastTilePos;
-	List<Vector3> possibleFwds;
+	List<Tile> path;
 
 	// Use this for initialization
 	void Start () {
@@ -21,7 +21,29 @@ public class Movement : MonoBehaviour {
 
 		if (Vector3.Distance (lastTilePos, transform.position) >= 1) {
 			lastTilePos += fwd;
-			Grid.TheGrid.CalcPathToCastle (lastTilePos);
+
+			if (path != null) {
+				if (path.IsEmpty ()) {
+					fwd = Vector3.zero;
+				} else if (!path [0].Occupied) {
+					Tile dest = path [0];
+					fwd = dest.transform.position - lastTilePos;
+					transform.position = lastTilePos;
+					path.Remove (dest);
+				} else {
+					path = Grid.TheGrid.CalcPathToCastle (lastTilePos);
+					Tile dest = path [0];
+					fwd = dest.transform.position - lastTilePos;
+					transform.position = lastTilePos;
+					path.Remove (dest);
+				}
+			} else {
+				path = Grid.TheGrid.CalcPathToCastle (lastTilePos);
+				Tile dest = path [0];
+				fwd = dest.transform.position - lastTilePos;
+				transform.position = lastTilePos;
+				path.Remove (dest);
+			}
 		}
     }
 
