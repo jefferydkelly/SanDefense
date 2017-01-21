@@ -11,6 +11,10 @@ public class GameInfo : MonoBehaviour {
     public float maxCastleHealth;
     public float currentHealth;
 
+    public Slider healthSlider;
+    public Slider waveSlider;
+
+
     private int timer = 0;
 
     public UnityEngine.UI.Text healthDisplay;
@@ -20,7 +24,14 @@ public class GameInfo : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         currentHealth = maxCastleHealth;
-	}
+
+        healthSlider.maxValue = maxCastleHealth;
+        healthSlider.value = maxCastleHealth;
+
+        waveSlider.maxValue = maxWaves;
+        waveSlider.value = currentWave;
+
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -35,11 +46,15 @@ public class GameInfo : MonoBehaviour {
 
         healthDisplay.text = currentHealth + " / " + maxCastleHealth;
         waveDisplay.text = "\t" + currentWave + " / " + maxWaves;
-        moneyDisplay.text = "\t" + currentMoney; 
-	}
+        moneyDisplay.text = "\t" + currentMoney;
+
+        healthSlider.value = currentHealth;
+        waveSlider.value = currentWave;
+    }
 
     public void takeDamage(int amount)
     {
         currentHealth -= amount;
+        currentWave += amount;
     }
 }
