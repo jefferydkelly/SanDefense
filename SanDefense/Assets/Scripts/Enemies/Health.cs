@@ -59,6 +59,7 @@ public class Health : MonoBehaviour {
 		if (currentHealth <= 0)
 		{
 			EnemyManager.Instance.Enemies.Remove (gameObject);
+            GameManager.Instance.funds(3);
 			Destroy(gameObject);
 		}
     }

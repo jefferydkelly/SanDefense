@@ -77,7 +77,7 @@ public class GameManager : MonoBehaviour {
 			}
 		}
 
-        moneyText.text = moneyAmount.ToString();
+        moneyText.text = "\t" + moneyAmount.ToString();
 	}
 	void StartWave() {
 		
@@ -142,12 +142,7 @@ public class GameManager : MonoBehaviour {
 		UIManager.Instance.SetGameState ("Game");
 	}
 
-    public void buildTower(int price)
-    {
-        moneyAmount -= price;
-    }
-
-    public void refundTower(int price)
+    public void funds(int price)
     {
         moneyAmount += price;
     }

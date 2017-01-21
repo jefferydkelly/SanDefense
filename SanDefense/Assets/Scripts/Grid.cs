@@ -116,7 +116,7 @@ public class Grid : MonoBehaviour {
 
 								numTurrets++;
 
-                                GameManager.Instance.buildTower(25);
+                                GameManager.Instance.funds(-25);
 							}
 								selectedTile.Selected = false;
 								selectedTile = null;
