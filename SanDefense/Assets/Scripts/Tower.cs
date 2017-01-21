@@ -11,9 +11,19 @@ public class Tower : MonoBehaviour
         AttackLowest,
     };
 
+    public enum ShootStyle
+    {
+        Straight,
+        Lob,
+    };
+
     public GameObject bullet; //prefab of bullet to 
     public GameObject turretHead; //this turns and shoot, if none use the game object this is attached to to turn
-    public AttackStyle attackStyle = AttackStyle.AttackLowest; //ai attack style
+    public AttackStyle attackStyle = AttackStyle.AttackLowest; //algorithm to determine the target
+    public ShootStyle shootStyle = ShootStyle.Straight;
+
+    [Range(0, 500)]
+    public float damage = 20;
 
     [Range(0, 3)]
     public float attackCooldown = 1;
@@ -73,6 +83,7 @@ public class Tower : MonoBehaviour
             case AttackStyle.AttackLowest:
                 target = null;
                 break;
+
             case AttackStyle.AttackFurthest:
                 target = null;
                 float furthestDist = 0;
@@ -104,7 +115,8 @@ public class Tower : MonoBehaviour
                 }
                 break;
             case AttackStyle.AttackFirstEnemy:
-                //breaks 
+
+                //breaks if already havew target
                 if (target) break;
                 foreach (GameObject enemy in enemies)
                 {
@@ -130,6 +142,10 @@ public class Tower : MonoBehaviour
     void DetermineDirection()
     {
         targetForward = (target.transform.position - transform.position).normalized;
+        if (shootStyle == ShootStyle.Lob)
+        {
+            targetForward = (targetForward + Vector3.up).normalized;
+        } 
     }
 
     /// <summary>
@@ -139,9 +155,8 @@ public class Tower : MonoBehaviour
     {
         if (timer > attackCooldown)
         {
-            //print("Shot " + target.name);
-            Bullet bul = (Instantiate(bullet, transform.position, head.transform.rotation, transform)).GetComponent<Bullet>();
-            bul.Initialize(target, bulletSpeed);
+            Bullet bul = (Instantiate(bullet, head.transform.position, head.transform.rotation, transform)).GetComponent<Bullet>();
+            bul.Initialize(target, bulletSpeed, damage);
             timer = 0;
         }
     }
