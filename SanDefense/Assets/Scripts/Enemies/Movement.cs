@@ -9,6 +9,9 @@ public class Movement : MonoBehaviour {
 	public Vector3 fwd = new Vector3(0, 0, 1);
 	Vector3 lastTilePos;
 	List<Tile> path;
+	[SerializeField]
+	float atkTime = 1f;
+	float atkDamage = 1f;
 	// Use this for initialization
 	void Start () {
 		lastTilePos = transform.position;
@@ -25,6 +28,7 @@ public class Movement : MonoBehaviour {
 				if (path.IsEmpty ()) {
 					fwd = Vector3.zero;
 					Grid.TheGrid.GetTileAt (lastTilePos).Occupant = gameObject;
+					InvokeRepeating ("Attack", atkTime, atkTime);
 				} else if (!path [0].Occupied) {
 					Tile dest = path [0];
 					fwd = dest.transform.position - lastTilePos;
@@ -68,5 +72,9 @@ public class Movement : MonoBehaviour {
 			fwd = Vector3.zero;
 		}
 	
+	}
+
+	void Attack() {
+		GameManager.Instance.DamageCastle (atkDamage);
 	}
 }
