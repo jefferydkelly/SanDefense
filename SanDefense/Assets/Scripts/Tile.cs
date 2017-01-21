@@ -46,7 +46,7 @@ public class Tile : MonoBehaviour {
 	/// <value><c>true</c> if selected; otherwise, <c>false</c>.</value>
 	public bool Selected {
 		set {
-			myRenderer.material.color = value ? Color.cyan : Color.white;
+			myRenderer.material.color = value ? Color.red : Color.white;
 		}
 	}
 }
