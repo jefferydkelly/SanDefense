@@ -25,6 +25,7 @@ public class Tower : MonoBehaviour
     private GameObject[] enemies;
     private GameObject target;
     private float timer = 0;
+    private Vector3 targetForward;
 
 
     // Use this for initialization
@@ -75,7 +76,7 @@ public class Tower : MonoBehaviour
                             dist.sqrMagnitude > Mathf.Pow(furthestDist, 2) &&
                             dist.magnitude > furthestDist)
                         {
-                            print("Targeting: " + enemy.gameObject.name + " " + furthestDist);
+                            //print("Targeting: " + enemy.gameObject.name + " " + furthestDist);
                             target = enemy;
                             furthestDist = dist.magnitude;
                         }
@@ -103,19 +104,22 @@ public class Tower : MonoBehaviour
         }
 
 
+        targetForward = head.forward;
 
         if (target)
         {
-            head.forward = (target.transform.position - transform.position).normalized;
+            targetForward = (target.transform.position - transform.position).normalized;
 
             if (timer > attackCooldown)
             {
+                //print("Shot " + target.name);
                 Bullet bul = (Instantiate(bullet, transform.position, head.transform.rotation, transform)).GetComponent<Bullet>();
                 bul.Initialize(target);
                 timer = 0;
             }
         }
 
+        head.forward = Vector3.Lerp(head.forward, targetForward, .5f);
         timer += Time.deltaTime;
     }
 
