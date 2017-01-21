@@ -12,8 +12,10 @@ public class GameManager : MonoBehaviour {
     [SerializeField]
 	int maxCastleHP;
 	int waveNumber;
+
 	[SerializeField]
 	int maxWaves = 10;
+
 	WaveState waveState;
 	ImageBoxWithBackground msgBox;
 	public Slider castleHealthDisplay;
@@ -38,7 +40,8 @@ public class GameManager : MonoBehaviour {
 			msgBox.Enabled = false;
 			hpText = castleHealthDisplay.GetComponentInChildren<Text>();
 			waveText = waveDisplay.GetComponentInChildren<Text> ();
-			startWaveDelegate = () => {
+
+            startWaveDelegate = () => {
 				StartWave ();
 			};
 			endWaveDelegate = () => {
@@ -58,9 +61,11 @@ public class GameManager : MonoBehaviour {
 			gameRunning = true;
 			paused = false;
 			curCastleHP = maxCastleHP;
-			waveNumber = 0;
+			waveNumber = 1;
 
-			castleHealthDisplay.maxValue = maxCastleHP;
+            waveDisplay.value = waveNumber;
+
+            castleHealthDisplay.maxValue = maxCastleHP;
 
 
 			hpText.text = maxCastleHP + " / " + maxCastleHP;
@@ -84,10 +89,15 @@ public class GameManager : MonoBehaviour {
 			}
 		}
 
-        
+<<<<<<< HEAD
+
+=======
+        moneyText.text = "\t" + moneyAmount.ToString();
+        waveText.text = "\t" + waveNumber + " / " + maxWaveNumber;
+>>>>>>> 5e4cce4f7436c82c6d28e34bd0845442eb55e72c
 	}
 	void StartWave() {
-		
+
 		waveState = WaveState.Wave;
 		msgBox.Text = "Wave " + waveNumber + " Start";
 		Invoke ("HideMessage", 2.0f);
@@ -192,7 +202,7 @@ public struct ImageBoxWithBackground {
 			txt.enabled = value;
 		}
 	}
-		
+
 	public string Text {
 		get {
 			return txt.text;
