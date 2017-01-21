@@ -88,13 +88,6 @@ public class GameManager : MonoBehaviour {
 				UIManager.Instance.SetGameState ("Pause");
 			}
 		}
-
-<<<<<<< HEAD
-
-=======
-        moneyText.text = "\t" + moneyAmount.ToString();
-        waveText.text = "\t" + waveNumber + " / " + maxWaveNumber;
->>>>>>> 5e4cce4f7436c82c6d28e34bd0845442eb55e72c
 	}
 	void StartWave() {
 
