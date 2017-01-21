@@ -59,4 +59,15 @@ public class GameInfo : MonoBehaviour {
         //Set the next wave
         currentWave++;
     }
+
+    public void buildTower(int price)
+    {
+        //Take away money for each tower that you build
+        currentMoney -= price;
+    }
+
+    public void refundTower(int price)
+    {
+        currentMoney += price;
+    }
 }
