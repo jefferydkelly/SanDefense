@@ -64,9 +64,11 @@ public class Tower : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        enemies = GameObject.FindGameObjectsWithTag("Enemy");
+		if (target == null) {
+			enemies = GameObject.FindGameObjectsWithTag ("Enemy");
 
-        DetermineTarget();
+			DetermineTarget ();
+		}
 
         targetForward = head.forward;
 
@@ -98,12 +100,11 @@ public class Tower : MonoBehaviour
                     {
                         Vector3 dist = enemy.transform.position - transform.position;
                         dist.y = 0;
-
-                        if (dist.sqrMagnitude < radiusSqr && dist.magnitude < radius &&
-                            enemy.GetComponent<Health>().CurHealth < lowestHealth)
+						float enemyHealth = enemy.GetComponent<Health> ().CurHealth;
+                        if (dist.sqrMagnitude < radiusSqr && enemyHealth < lowestHealth)
                         {
                             target = enemy;
-                            lowestHealth = enemy.GetComponent<Health>().CurHealth;
+                            lowestHealth = enemyHealth;
                         }
                     }
                 }
@@ -128,14 +129,11 @@ public class Tower : MonoBehaviour
                         //print(dist.magnitude > furthestDist);
 
                         //checks if in radius and if further than current max
-                        if (dist.sqrMagnitude < radiusSqr &&
-                            dist.magnitude < radius &&
-                            dist.sqrMagnitude > Mathf.Pow(furthestDist, 2) &&
-                            dist.magnitude > furthestDist)
+                        if (dist.sqrMagnitude < radiusSqr && dist.sqrMagnitude > furthestDist)
                         {
                             //print("Targeting: " + enemy.gameObject.name + " " + furthestDist);
                             target = enemy;
-                            furthestDist = dist.magnitude;
+                            furthestDist = dist.sqrMagnitude;
                         }
                     }
                 }
@@ -150,7 +148,7 @@ public class Tower : MonoBehaviour
                     dist.y = 0;
 
                     //if in range break out of switch
-                    if (dist.sqrMagnitude < radiusSqr && dist.magnitude < radius)
+                    if (dist.sqrMagnitude < radiusSqr)
                         break;
                     else target = null; //resets target and search for new one
                 }
@@ -164,7 +162,7 @@ public class Tower : MonoBehaviour
                         Vector3 dist = enemy.transform.position - transform.position;
                         dist.y = 0;
 
-                        if (dist.sqrMagnitude < radiusSqr && dist.magnitude < radius)
+                        if (dist.sqrMagnitude < radiusSqr)
                         {
                             target = enemy;
                             break;
