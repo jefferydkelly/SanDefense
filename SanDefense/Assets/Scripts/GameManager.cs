@@ -19,6 +19,11 @@ public class GameManager : MonoBehaviour {
 	public Text moneyText;
 	bool gameRunning = false;
 
+	Coroutine currentCoroutine;
+	WaitDelegate startWaveDelegate;
+	WaitDelegate endWaveDelegate;
+	WaitDelegate startSetupDelegate;
+
 	// Use this for initialization
 	void Start () {
 		if (instance == null) {
@@ -26,6 +31,15 @@ public class GameManager : MonoBehaviour {
 			//msgBox = new ImageBoxWithBackground ("Message");
 			hpText = castleHealthDisplay.GetComponentInChildren<Text>();
 			waveText = waveDisplay.GetComponentInChildren<Text> ();
+			startWaveDelegate = () => {
+				StartWave ();
+			};
+			endWaveDelegate = () => {
+				EndWave ();
+			};
+			startSetupDelegate = () {
+				StartSetup();
+			};
 		} else {
 			Destroy (gameObject);
 		}
@@ -68,7 +82,7 @@ public class GameManager : MonoBehaviour {
 		//msgBox.Text = "Wave " + waveNumber + " Start";
 		//Invoke ("HideMessage", 5.0f);
 		Grid.TheGrid.StartWave ();
-		Invoke ("EndWave", 15 * (waveNumber + 1));
+		currentCoroutine = StartCoroutine (gameObject.RunAfter(endWaveDelegate, 15 * (waveNumber + 1)));
 	}
 
 	void EndWave() {
@@ -76,7 +90,7 @@ public class GameManager : MonoBehaviour {
 		//msgBox.Text = "Wave Over";
 		Invoke ("HideMessage", 5.0f);
 		Grid.TheGrid.EndWave ();
-		Invoke ("StartSetup", 10);
+		currentCoroutine = StartCoroutine (gameObject.RunAfter(startSetupDelegate, 10));
 	}
 
 	void StartSetup() {
@@ -87,7 +101,7 @@ public class GameManager : MonoBehaviour {
 		waveState = WaveState.SetUp;
 		waveNumber++;
 		waveDisplay.value = waveNumber;
-		Invoke ("StartWave", 15);
+		currentCoroutine = StartCoroutine (gameObject.RunAfter(startWaveDelegate, 15));
 	}
 	/// <summary>
 	/// Damages the castle.  If Castle HP drops below 0, the game's over.
@@ -121,18 +135,7 @@ public class GameManager : MonoBehaviour {
 	public void RestartGame() {
 		gameRunning = false;
 		Grid.TheGrid.Clear();
-		switch (waveState) {
-
-		case WaveState.SetUp:
-			CancelInvoke ("StartWave");
-			break;
-		case WaveState.Wave:
-			CancelInvoke ("EndWave");
-			break;
-		case WaveState.EndWave:
-			CancelInvoke ("StartSetup");
-			break;
-		}
+		StopCoroutine (currentCoroutine);
 		UIManager.Instance.SetGameState ("Game");
 	}
 }
