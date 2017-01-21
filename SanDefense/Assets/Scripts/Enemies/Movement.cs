@@ -14,11 +14,13 @@ public class Movement : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        points = GameObject.FindGameObjectsWithTag("Path");
     }
 	
 	// Update is called once per frame
 	void Update () {
+
+        //Get all of the points that are in the path
+        points = GameObject.FindGameObjectsWithTag("Path");
 
         //Move the enemy towards the next pathpoint
         gameObject.transform.position = Vector3.MoveTowards(gameObject.transform.position, points[pointNumber].transform.position, Time.deltaTime * speed);
