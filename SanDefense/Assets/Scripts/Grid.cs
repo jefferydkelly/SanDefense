@@ -8,19 +8,24 @@ public class Grid : MonoBehaviour {
 	public Vector2 gridSize = new Vector2(10, 10);
 	public GameObject tilePrefab;
 	Tile selectedTile;
+	public GameObject spawnPrefab;
+	List<GameObject> spawnTiles = new List<GameObject>();
 
 
 	// Use this for initialization
 	void Start () {
 		int tileNum = 1;
 
-		for (int i = 0; i < gridSize.x; i++) {
-			for (int j = 0; j < gridSize.y; j++) {
+		for (int i = 0; i < gridSize.y; i++) {
+			for (int j = 0; j < gridSize.x; j++) {
 				GameObject tile = Instantiate (tilePrefab);
-				tile.transform.position = startPosition + new Vector3 (i, 0, j);
+				tile.transform.position = startPosition + new Vector3 (j, 0, i);
 				tile.name = "Tile " + tileNum;
 				tileNum++;
 			}
+
+			GameObject spawn = Instantiate (spawnPrefab);
+			spawn.transform.position = startPosition + new Vector3 (i, 0, -1);
 		}
 	}
 
