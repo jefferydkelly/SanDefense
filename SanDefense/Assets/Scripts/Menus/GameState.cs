@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class GameState : MonoBehaviour {
 
+    //The gamestate that the game is currently in
     public string gameState;
 
+    //The different empty objects that contain different visuals
     public GameObject game;
     public GameObject difficulty;
     public GameObject mainMenu;
@@ -14,12 +16,16 @@ public class GameState : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        //Start the game at the main menu
         gameState = "mainMenu";
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
+        //Test the game state
+        //Activate the current empty object that should display
+        //Deactivate all the other empty objects
         if (gameState == "game")
             game.SetActive(true);
         else

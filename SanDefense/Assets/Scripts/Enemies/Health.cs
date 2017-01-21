@@ -14,6 +14,8 @@ public class Health : MonoBehaviour {
     private float originalScale;
     private Transform healthBar;
 
+    ParticleSystem particleSystem;
+
     public float CurHealth
     {
         get { return currentHealth; }
@@ -30,7 +32,9 @@ public class Health : MonoBehaviour {
 
         //Set the maximum size for the health bar
         originalScale = healthBar.localScale.x;
-	}
+
+        particleSystem = gameObject.GetComponentInChildren<ParticleSystem>();
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -48,6 +52,9 @@ public class Health : MonoBehaviour {
     //Deal damage to the enemy
     public void TakeDamage(float amount) {
         currentHealth -= amount;
+<<<<<<< HEAD
+        particleSystem.Play();
+=======
 
 		//Test if the current health of the enemy is less than 0
 		//Destroy the enemy
@@ -56,6 +63,7 @@ public class Health : MonoBehaviour {
 			EnemyManager.Instance.Enemies.Remove (gameObject);
 			Destroy(gameObject);
 		}
+>>>>>>> f5ea32d499b61e6e43dc86dece73bd769e97164b
     }
 
     //Heal the enemy

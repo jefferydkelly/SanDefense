@@ -16,6 +16,8 @@ public class MainMenu : MonoBehaviour {
 
     public void buttonClick(string name)
     {
+        //Test the name of the button that is pressed
+        //Change the game state relative to the button that is pressed
         switch (name)
         {
             case "play":
