@@ -42,6 +42,7 @@ public class Tower : MonoBehaviour
     private float timer = 0;
     private Vector3 targetForward;
 
+	Renderer myRenderer;
 
     // Use this for initialization
     void Start()
@@ -55,6 +56,7 @@ public class Tower : MonoBehaviour
         enemies = GameObject.FindGameObjectsWithTag("Enemy");
 
         radiusSqr = Mathf.Pow(radius, 2);
+		myRenderer = GetComponent<Renderer> ();
     }
 
     // Update is called once per frame
@@ -204,4 +206,10 @@ public class Tower : MonoBehaviour
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, radius);
     }
+
+	public bool Highlighted {
+		set {
+			myRenderer.material.color = value ? Color.red : Color.white;
+		}
+	}
 }
