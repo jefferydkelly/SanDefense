@@ -6,10 +6,8 @@ public class Health : MonoBehaviour {
 
     //The maximum health of the enemy
     //The amount of health the enemy currently has
-    //The amount of money earned for killing this enemy
     public float maxHealth;
     private float currentHealth;
-    public int value;
 
     //The size of the health bar when full
     //The health bar
@@ -64,7 +62,6 @@ public class Health : MonoBehaviour {
 		{
             Instantiate(SandDollar, transform.position, Quaternion.identity);
 			EnemyManager.Instance.Enemies.Remove (gameObject);
-            GameManager.Instance.funds(value);
 			Destroy(gameObject);
 		}
     }
