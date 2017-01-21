@@ -19,23 +19,34 @@ public class Movement : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		transform.position += fwd * speed * Time.deltaTime;
+		if (!GameManager.Instance.IsPaused) {
+			transform.position += fwd * speed * Time.deltaTime;
 
-		if (Vector3.Distance (lastTilePos, transform.position) >= 1) {
-			lastTilePos += fwd;
+			if (Vector3.Distance (lastTilePos, transform.position) >= 1) {
+				lastTilePos += fwd;
 
-			if (path != null) {
-				if (path.IsEmpty ()) {
-					fwd = Vector3.zero;
-					InvokeRepeating ("Attack", atkTime, atkTime);
-				} else if (!path [0].Occupied) {
-					Tile dest = path [0];
-					fwd = dest.transform.position - lastTilePos;
-					transform.position = lastTilePos;
-					path.Remove (dest);
+				if (path != null) {
+					if (path.IsEmpty ()) {
+						fwd = Vector3.zero;
+						WaitDelegate atkDelegate = () => {
+							Attack();
+						};
+						StartCoroutine(gameObject.RunAfterRepeating(atkDelegate, atkTime));
+					} else if (!path [0].Occupied) {
+						Tile dest = path [0];
+						fwd = dest.transform.position - lastTilePos;
+						transform.position = lastTilePos;
+						path.Remove (dest);
 
-					if (path.IsEmpty()) {
-						dest.Occupant = gameObject;
+						if (path.IsEmpty ()) {
+							dest.Occupant = gameObject;
+						}
+					} else {
+						path = Grid.TheGrid.CalcPathToCastle (lastTilePos);
+						Tile dest = path [0];
+						fwd = dest.transform.position - lastTilePos;
+						transform.position = lastTilePos;
+						path.Remove (dest);
 					}
 				} else {
 					path = Grid.TheGrid.CalcPathToCastle (lastTilePos);
@@ -44,12 +55,6 @@ public class Movement : MonoBehaviour {
 					transform.position = lastTilePos;
 					path.Remove (dest);
 				}
-			} else {
-				path = Grid.TheGrid.CalcPathToCastle (lastTilePos);
-				Tile dest = path [0];
-				fwd = dest.transform.position - lastTilePos;
-				transform.position = lastTilePos;
-				path.Remove (dest);
 			}
 		}
     }

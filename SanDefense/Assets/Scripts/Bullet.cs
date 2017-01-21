@@ -2,17 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
 public class Bullet : MonoBehaviour
 {
     float timer = 0;
     float timeToDestroy = 10;
     float maxSpeed = 1;
     float damage = 10;
+	Vector3 velocity;
 
     GameObject target;
-
-    Rigidbody rb;
 
 
 
@@ -20,13 +18,8 @@ public class Bullet : MonoBehaviour
     {
         this.target = target;
         maxSpeed = speed;
-        rb.velocity = transform.forward * maxSpeed;
+        //rb.velocity = transform.forward * maxSpeed;
         this.damage = damage;
-    }
-
-    void Awake()
-    {
-        rb = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
@@ -34,13 +27,12 @@ public class Bullet : MonoBehaviour
     {
         if (target)
         {
-			//JD: I tested this just to see what it would look like if it went directly at the enemy instead of looping around like yours.
-			rb.velocity = maxSpeed * (target.transform.position - transform.position).normalized;
-            
-			//rb.AddForce(maxSpeed * (target.transform.position - transform.position).normalized - rb.velocity);
-
-            if (timer > timeToDestroy) Destroy(gameObject);
-            else timer += Time.deltaTime;
+			if (!GameManager.Instance.IsPaused) {
+				transform.position += maxSpeed * (target.transform.position - transform.position).normalized * Time.deltaTime;
+	            
+	            if (timer > timeToDestroy) Destroy(gameObject);
+	            else timer += Time.deltaTime;
+			}
         }
         else
         {
@@ -51,7 +43,7 @@ public class Bullet : MonoBehaviour
 
     void OnTriggerEnter(Collider collision)
     {
-        if (collision.gameObject.tag == "Enemy")
+		if (collision.gameObject.tag == "Enemy")
         {
             collision.gameObject.GetComponent<Health>().TakeDamage(damage);
             Destroy(gameObject);
