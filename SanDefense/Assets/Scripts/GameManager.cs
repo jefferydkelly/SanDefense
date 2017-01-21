@@ -17,41 +17,56 @@ public class GameManager : MonoBehaviour {
 	public Slider waveDisplay;
 	Text waveText;
 	public Text moneyText;
+	bool gameRunning = false;
 
 	// Use this for initialization
 	void Start () {
 		if (instance == null) {
 			instance = this;
-			curCastleHP = maxCastleHP;
-			waveNumber = 0;
 			//msgBox = new ImageBoxWithBackground ("Message");
-			//castleHealthDisplay.enabled = true;
-			castleHealthDisplay.maxValue = 100;//maxCastleHP;
-
 			hpText = castleHealthDisplay.GetComponentInChildren<Text>();
-			hpText.text = maxCastleHP + " / " + maxCastleHP;
-
 			waveText = waveDisplay.GetComponentInChildren<Text> ();
-			StartSetup ();
 		} else {
 			Destroy (gameObject);
 		}
 	}
 
+	public void StartGame() {
+		if (!gameRunning) {
+			gameRunning = true;
+			paused = false;
+			curCastleHP = maxCastleHP;
+			waveNumber = 0;
+
+			castleHealthDisplay.maxValue = maxCastleHP;
+
+
+			hpText.text = maxCastleHP + " / " + maxCastleHP;
+
+
+			StartWave ();
+		} else if (paused) {
+			paused = false;
+		}
+	}
 	void HideMessage() {
-		//msgBox.Enabled = false;
+		msgBox.Enabled = false;
 	}
 
 	void Update() {
 		if (Input.GetKeyDown (KeyCode.P)) {
 			paused = !paused;
+
+			if (paused) {
+				UIManager.Instance.SetGameState ("Pause");
+			}
 		}
 	}
 	void StartWave() {
 		
 		waveState = WaveState.Wave;
 		//msgBox.Text = "Wave " + waveNumber + " Start";
-		Invoke ("HideMessage", 5.0f);
+		//Invoke ("HideMessage", 5.0f);
 		Grid.TheGrid.StartWave ();
 		Invoke ("EndWave", 15 * (waveNumber + 1));
 	}
@@ -71,6 +86,7 @@ public class GameManager : MonoBehaviour {
 		Invoke ("HideMessage", 5.0f);
 		waveState = WaveState.SetUp;
 		waveNumber++;
+		waveDisplay.value = waveNumber;
 		Invoke ("StartWave", 15);
 	}
 	/// <summary>
@@ -79,8 +95,8 @@ public class GameManager : MonoBehaviour {
 	/// <param name="dmg">Dmg.</param>
 	public void DamageCastle(int dmg) {
 		curCastleHP -= dmg;
-		castleHealthDisplay.value = 100;
-		hpText.text = maxCastleHP + " / " + maxCastleHP;
+		castleHealthDisplay.value = curCastleHP;
+		hpText.text = curCastleHP + " / " + maxCastleHP;
 		if (curCastleHP < 0) {
 			Debug.Log ("Game over, man!  Game over");
 		}
@@ -100,6 +116,24 @@ public class GameManager : MonoBehaviour {
 		get {
 			return paused;
 		}
+	}
+
+	public void RestartGame() {
+		gameRunning = false;
+		Grid.TheGrid.Clear();
+		switch (waveState) {
+
+		case WaveState.SetUp:
+			CancelInvoke ("StartWave");
+			break;
+		case WaveState.Wave:
+			CancelInvoke ("EndWave");
+			break;
+		case WaveState.EndWave:
+			CancelInvoke ("StartSetup");
+			break;
+		}
+		UIManager.Instance.SetGameState ("Game");
 	}
 }
 
