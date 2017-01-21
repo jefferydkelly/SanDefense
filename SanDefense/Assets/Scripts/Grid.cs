@@ -18,6 +18,9 @@ public class Grid : MonoBehaviour {
 	float spawnTime = 1.0f;
 	[SerializeField]
 	int maxEnemies;
+	[SerializeField]
+	int maxTurrets;
+	int numTurrets = 0;
 
 	//The UI
 	public GameObject buildButton;
@@ -99,10 +102,17 @@ public class Grid : MonoBehaviour {
 				
 						if (!selectedTile.Occupied) {
 							//Place down a tower
-							selectedTile.Occupant = clickState == ClickStates.BuildTurret ? Instantiate (towerPrefab) : Instantiate (wallPrefab);
-							selectedTile.Occupant.transform.parent = towerHolder.transform;
-							selectedTile.Selected = false;
-							selectedTile = null;
+							if (numTurrets < maxTurrets) {
+								GameObject turret = clickState == ClickStates.BuildTurret ? Instantiate (towerPrefab) : Instantiate (wallPrefab);
+								selectedTile.Occupant =  turret;
+								turret.transform.position = selectedTile.transform.position;
+								selectedTile.Occupant.transform.parent = towerHolder.transform;
+
+								numTurrets++;
+							}
+								selectedTile.Selected = false;
+								selectedTile = null;
+							
 							ClickState = ClickStates.None;
 						}
 					}
@@ -192,7 +202,10 @@ public class Grid : MonoBehaviour {
 		int offset = 1;
 		while (goal.Occupied) {
 			dest = new Vector3 (startPos.x + offset, startPos.y, (startPosition.x + gridSize.y));
-			goal = GetTileAt(dest);
+			Tile test = GetTileAt(dest);
+			if (test) {
+				goal = test;
+			}
 			offset *= -1;
 			if (offset > 0) {
 				offset++;
