@@ -17,7 +17,7 @@ public class Tower : MonoBehaviour
         Lob,
     };
 
-    public GameObject bullet; //prefab of bullet to 
+    public GameObject bullet; //prefab of bullet to
     public GameObject turretHead; //this turns and shoot, if none use the game object this is attached to to turn
     public AttackStyle attackStyle = AttackStyle.AttackLowest; //algorithm to determine the target
     public ShootStyle shootStyle = ShootStyle.Straight;
@@ -43,6 +43,7 @@ public class Tower : MonoBehaviour
     private Vector3 targetForward;
 
 	Renderer myRenderer;
+	Renderer headRenderer;
 
     // Use this for initialization
     void Start()
@@ -57,12 +58,12 @@ public class Tower : MonoBehaviour
 
         radiusSqr = Mathf.Pow(radius, 2);
 		myRenderer = GetComponent<Renderer> ();
+		headRenderer = turretHead.GetComponentInChildren<Renderer> ();
     }
 
     // Update is called once per frame
     void Update()
     {
-
         enemies = EnemyManager.Instance.Enemies;
         DetermineTarget();
 
@@ -96,12 +97,11 @@ public class Tower : MonoBehaviour
                     {
                         Vector3 dist = enemy.transform.position - transform.position;
                         dist.y = 0;
-
-                        if (dist.sqrMagnitude < radiusSqr && dist.magnitude < radius &&
-                            enemy.GetComponent<Health>().CurHealth < lowestHealth)
+						float enemyHealth = enemy.GetComponent<Health> ().CurHealth;
+                        if (dist.sqrMagnitude < radiusSqr && enemyHealth < lowestHealth)
                         {
                             target = enemy;
-                            lowestHealth = enemy.GetComponent<Health>().CurHealth;
+                            lowestHealth = enemyHealth;
                         }
                     }
                 }
@@ -126,14 +126,11 @@ public class Tower : MonoBehaviour
                         //print(dist.magnitude > furthestDist);
 
                         //checks if in radius and if further than current max
-                        if (dist.sqrMagnitude < radiusSqr &&
-                            dist.magnitude < radius &&
-                            dist.sqrMagnitude > Mathf.Pow(furthestDist, 2) &&
-                            dist.magnitude > furthestDist)
+                        if (dist.sqrMagnitude < radiusSqr && dist.sqrMagnitude > furthestDist)
                         {
                             //print("Targeting: " + enemy.gameObject.name + " " + furthestDist);
                             target = enemy;
-                            furthestDist = dist.magnitude;
+                            furthestDist = dist.sqrMagnitude;
                         }
                     }
                 }
@@ -148,7 +145,7 @@ public class Tower : MonoBehaviour
                     dist.y = 0;
 
                     //if in range break out of switch
-                    if (dist.sqrMagnitude < radiusSqr && dist.magnitude < radius)
+                    if (dist.sqrMagnitude < radiusSqr)
                         break;
                     else target = null; //resets target and search for new one
                 }
@@ -162,7 +159,7 @@ public class Tower : MonoBehaviour
                         Vector3 dist = enemy.transform.position - transform.position;
                         dist.y = 0;
 
-                        if (dist.sqrMagnitude < radiusSqr && dist.magnitude < radius)
+                        if (dist.sqrMagnitude < radiusSqr)
                         {
                             target = enemy;
                             break;
@@ -211,6 +208,7 @@ public class Tower : MonoBehaviour
 	public bool Highlighted {
 		set {
 			myRenderer.material.color = value ? Color.red : Color.white;
+			headRenderer.material.color = value ? Color.red : Color.white;
 		}
 	}
 }
