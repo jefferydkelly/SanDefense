@@ -61,7 +61,7 @@ public class GameManager : MonoBehaviour {
 			gameRunning = true;
 			paused = false;
 			curCastleHP = maxCastleHP;
-			waveNumber = 1;
+			waveNumber = 0;
 
             waveDisplay.value = waveNumber;
 
