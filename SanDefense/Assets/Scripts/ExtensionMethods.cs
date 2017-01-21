@@ -51,7 +51,7 @@ public static class ExtensionMethods {
 	public static IEnumerator RunAfter(this GameObject go, WaitDelegate w, float time)
 	{
 		float dt = 0;
-		Debug.Log (dt);
+
 		while (dt < time)
 		{
 			if (!GameManager.Instance.IsPaused)
