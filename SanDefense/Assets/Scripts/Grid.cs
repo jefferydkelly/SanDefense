@@ -72,8 +72,6 @@ public class Grid : MonoBehaviour {
 		directions.Add (new Vector3 (-1, 0, 0));
 		directions.Add (new Vector3 (0, 0, -1));
 		cancelButton.SetActive (false);
-
-		InvokeRepeating ("SpawnEnemy", 0.25f, spawnTime);
 	}
 
 	// Update is called once per frame
@@ -139,6 +137,17 @@ public class Grid : MonoBehaviour {
 			}
 		}
 
+	}
+
+	public void StartWave() {
+		InvokeRepeating ("SpawnEnemy", 0.5f, spawnTime);
+	}
+
+	public void EndWave() {
+		foreach (GameObject go in EnemyManager.Instance.Enemies) {
+			Destroy (go);
+		}
+		CancelInvoke ("SpawnEnemy");
 	}
 
 	/// <summary>

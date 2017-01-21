@@ -9,24 +9,45 @@ public class GameManager : MonoBehaviour {
 	[SerializeField]
 	float maxCastleHP;
 	int waveNumber;
+	WaveState waveState;
 	// Use this for initialization
 	void Start () {
 		if (instance == null) {
 			instance = this;
 			curCastleHP = maxCastleHP;
-			waveNumber = 1;
+			waveNumber = 0;
+			StartSetup ();
 		} else {
 			Destroy (gameObject);
 		}
 	}
 
+	void StartWave() {
+		Debug.Log ("The wave is started");
+		waveState = WaveState.Wave;
+		Grid.TheGrid.StartWave ();
+		Invoke ("EndWave", 15 * (waveNumber + 1));
+	}
+
+	void EndWave() {
+		Debug.Log ("The wave has ended");
+		waveState = WaveState.EndWave;
+		Grid.TheGrid.EndWave ();
+		Invoke ("StartSetup", 30);
+	}
+
+	void StartSetup() {
+		waveState = WaveState.SetUp;
+		waveNumber++;
+		Invoke ("StartWave", 15);
+	}
 	/// <summary>
 	/// Damages the castle.  If Castle HP drops below 0, the game's over.
 	/// </summary>
 	/// <param name="dmg">Dmg.</param>
 	public void DamageCastle(float dmg) {
 		curCastleHP -= dmg;
-		Debug.Log (curCastleHP);
+	
 		if (curCastleHP < 0) {
 			Debug.Log ("Game over, man!  Game over");
 		}
@@ -41,4 +62,10 @@ public class GameManager : MonoBehaviour {
 			return instance;
 		}
 	}
+}
+
+public enum WaveState {
+	SetUp,
+	Wave,
+	EndWave
 }

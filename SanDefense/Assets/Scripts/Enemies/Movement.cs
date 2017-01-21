@@ -27,13 +27,16 @@ public class Movement : MonoBehaviour {
 			if (path != null) {
 				if (path.IsEmpty ()) {
 					fwd = Vector3.zero;
-					Grid.TheGrid.GetTileAt (lastTilePos).Occupant = gameObject;
 					InvokeRepeating ("Attack", atkTime, atkTime);
 				} else if (!path [0].Occupied) {
 					Tile dest = path [0];
 					fwd = dest.transform.position - lastTilePos;
 					transform.position = lastTilePos;
 					path.Remove (dest);
+
+					if (path.IsEmpty()) {
+						dest.Occupant = gameObject;
+					}
 				} else {
 					path = Grid.TheGrid.CalcPathToCastle (lastTilePos);
 					Tile dest = path [0];
