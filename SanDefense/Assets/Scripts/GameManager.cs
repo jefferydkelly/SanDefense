@@ -12,12 +12,8 @@ public class GameManager : MonoBehaviour {
     [SerializeField]
 	int maxCastleHP;
 	int waveNumber;
-<<<<<<< HEAD
-    public int maxWaveNumber;
-=======
 	[SerializeField]
 	int maxWaves = 10;
->>>>>>> e8dcd4904afb721b255a23d40d9125152f0dbe9a
 	WaveState waveState;
 	ImageBoxWithBackground msgBox;
 	public Slider castleHealthDisplay;
@@ -89,7 +85,6 @@ public class GameManager : MonoBehaviour {
 		}
 
         moneyText.text = "\t" + moneyAmount.ToString();
-        waveText.text = "\t" + waveNumber + " / " + maxWaveNumber;
 	}
 	void StartWave() {
 		
