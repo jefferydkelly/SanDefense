@@ -52,9 +52,7 @@ public class Health : MonoBehaviour {
     //Deal damage to the enemy
     public void TakeDamage(float amount) {
         currentHealth -= amount;
-<<<<<<< HEAD
         particleSystem.Play();
-=======
 
 		//Test if the current health of the enemy is less than 0
 		//Destroy the enemy
@@ -63,7 +61,6 @@ public class Health : MonoBehaviour {
 			EnemyManager.Instance.Enemies.Remove (gameObject);
 			Destroy(gameObject);
 		}
->>>>>>> f5ea32d499b61e6e43dc86dece73bd769e97164b
     }
 
     //Heal the enemy
