@@ -43,9 +43,9 @@ public class Tower : MonoBehaviour
     private float timer = 0;
     private Vector3 targetForward;
 
-	Renderer myRenderer;
-	Renderer headRenderer;
-
+	Renderer[] renderers;
+	Color highlightColor = Color.red;
+	Color regularColor;
     // Use this for initialization
     void Start()
     {
@@ -56,8 +56,8 @@ public class Tower : MonoBehaviour
         else head = transform;
 
         radiusSqr = Mathf.Pow(radius, 2);
-		myRenderer = GetComponent<Renderer> ();
-		headRenderer = turretHead.GetComponentInChildren<Renderer> ();
+		renderers = GetComponentsInChildren<Renderer> ();
+		regularColor = renderers [0].material.color;
     }
 
     // Update is called once per frame
@@ -206,8 +206,10 @@ public class Tower : MonoBehaviour
 
 	public bool Highlighted {
 		set {
-			myRenderer.material.color = value ? Color.red : Color.white;
-			headRenderer.material.color = value ? Color.red : Color.white;
+			Color c = value ? highlightColor : regularColor;
+			foreach (Renderer r in renderers) {
+				r.material.color = c;
+			}
 		}
 	}
 }

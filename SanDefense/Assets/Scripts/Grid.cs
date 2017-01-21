@@ -106,7 +106,7 @@ public class Grid : MonoBehaviour {
 
 					if (Input.GetMouseButtonDown (0)) {
 				
-						if (!selectedTile.Occupied) {
+						if (!selectedTile.Occupied && GameManager.Instance.moneyAmount >= 25) {
 							//Place down a tower
 							if (numTurrets < maxTurrets) {
 								GameObject turret = clickState == ClickStates.BuildTurret ? Instantiate (towerPrefab) : Instantiate (wallPrefab);
@@ -129,7 +129,7 @@ public class Grid : MonoBehaviour {
 					selectedTile.Selected = false;
 				}
 			} else {
-				if (Physics.Raycast (mousePosition, Vector3.down, out hit, 10, 1 << LayerMask.NameToLayer ("Structures"))) {
+				if (Physics.Raycast (mousePosition, Vector3.down, out hit, Camera.main.transform.position.y, 1 << LayerMask.NameToLayer ("Structures"))) {
 					if (hit.collider.gameObject != selectedTower) {
 						if (selectedTower != null) {
 							selectedTower.Highlighted = false;
@@ -331,11 +331,7 @@ public class Grid : MonoBehaviour {
 	}
 
 	public void SetClickState(string cs) {
-
-        if (cs == "BuildTurret" && GameManager.Instance.moneyAmount >= 25)
-        {
-            ClickState = (ClickStates)System.Enum.Parse(typeof(ClickStates), cs);
-        }
+		ClickState = (ClickStates)System.Enum.Parse(typeof(ClickStates), cs);
 	}
 
 	ClickStates ClickState {
