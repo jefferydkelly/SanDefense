@@ -14,7 +14,12 @@ public class Tower : MonoBehaviour
     public GameObject bullet; //prefab of bullet to 
     public GameObject turretHead; //this turns and shoot, if none use the game object this is attached to to turn
     public AttackStyle attackStyle = AttackStyle.AttackLowest; //ai attack style
+
+    [Range(0, 3)]
     public float attackCooldown = 1;
+
+    [Range(0.5f,10)]
+    public float bulletSpeed = 2;
 
     [Range(3, 20)]
     public float radius = 5;
@@ -46,8 +51,23 @@ public class Tower : MonoBehaviour
     void Update()
     {
         enemies = GameObject.FindGameObjectsWithTag("Enemy");
-        //print(enemies[0]);
+        DetermineTarget();
 
+        targetForward = head.forward;
+
+        if (target)
+        {
+            DetermineDirection();
+            Shoot();
+        }
+
+
+        head.forward = Vector3.Lerp(head.forward, targetForward, .5f);
+        timer += Time.deltaTime;
+    }
+
+    void DetermineTarget()
+    {
         switch (attackStyle)
         {
             case AttackStyle.AttackLowest:
@@ -102,25 +122,28 @@ public class Tower : MonoBehaviour
                 }
                 break;
         }
+    }
 
+    /// <summary>
+    /// Determines direction based on where the enemy is
+    /// </summary>
+    void DetermineDirection()
+    {
+        targetForward = (target.transform.position - transform.position).normalized;
+    }
 
-        targetForward = head.forward;
-
-        if (target)
+    /// <summary>
+    /// Checks the cooldown and shoots at the enemy
+    /// </summary>
+    void Shoot()
+    {
+        if (timer > attackCooldown)
         {
-            targetForward = (target.transform.position - transform.position).normalized;
-
-            if (timer > attackCooldown)
-            {
-                //print("Shot " + target.name);
-                Bullet bul = (Instantiate(bullet, transform.position, head.transform.rotation, transform)).GetComponent<Bullet>();
-                bul.Initialize(target);
-                timer = 0;
-            }
+            //print("Shot " + target.name);
+            Bullet bul = (Instantiate(bullet, transform.position, head.transform.rotation, transform)).GetComponent<Bullet>();
+            bul.Initialize(target, bulletSpeed);
+            timer = 0;
         }
-
-        head.forward = Vector3.Lerp(head.forward, targetForward, .5f);
-        timer += Time.deltaTime;
     }
 
     //for visualizing radius

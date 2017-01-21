@@ -6,12 +6,14 @@ public class Bullet : MonoBehaviour
 {
     float timer = 0;
     float timeToDestroy = 10;
+    float speedBuffer = 1;
 
     GameObject target;
 
-    public void Initialize(GameObject target)
+    public void Initialize(GameObject target, float speed)
     {
         this.target = target;
+        speedBuffer = speed;
     }
 
 
@@ -22,7 +24,7 @@ public class Bullet : MonoBehaviour
         if (target)
         {
             Vector3 pos = transform.position;
-            pos += 0.2f * (target.transform.position - pos).normalized;
+            pos += 0.2f * speedBuffer * (target.transform.position - pos).normalized;
             transform.position = pos;
 
             if (timer > timeToDestroy) Destroy(gameObject);
