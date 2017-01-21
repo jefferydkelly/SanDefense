@@ -17,7 +17,7 @@ public class Tower : MonoBehaviour
         Lob,
     };
 
-    public GameObject bullet; //prefab of bullet to 
+    public GameObject bullet; //prefab of bullet to
     public GameObject turretHead; //this turns and shoot, if none use the game object this is attached to to turn
     public AttackStyle attackStyle = AttackStyle.AttackLowest; //algorithm to determine the target
     public ShootStyle shootStyle = ShootStyle.Straight;
@@ -54,7 +54,7 @@ public class Tower : MonoBehaviour
             head = turretHead.transform;
         else head = transform;
 
-        enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        enemies = EnemyManager.Instance.Enemies;
 
         radiusSqr = Mathf.Pow(radius, 2);
 		myRenderer = GetComponent<Renderer> ();
@@ -64,22 +64,19 @@ public class Tower : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-		if (target == null) {
-			enemies = GameObject.FindGameObjectsWithTag ("Enemy");
-
-			DetermineTarget ();
-		}
+        enemies = EnemyManager.Instance.Enemies;
+        DetermineTarget();
 
         targetForward = head.forward;
 
         if (target)
         {
             DetermineDirection();
+            head.forward = Vector3.Lerp(head.forward, targetForward, .6f);
             Shoot();
         }
 
 
-        head.forward = Vector3.Lerp(head.forward, targetForward, .5f);
         timer += Time.deltaTime;
     }
 
