@@ -9,9 +9,15 @@ public class Grid : MonoBehaviour {
 	/// </summary>
 	public GameObject tilePrefab;
 	public GameObject spawnPrefab;
-	public GameObject enemyPrefab;
+	[SerializeField]
+	List<GameObject> enemiePrefabs;
 	public GameObject towerPrefab;
 	public GameObject wallPrefab;
+
+	[SerializeField]
+	float spawnTime = 1.0f;
+	[SerializeField]
+	int maxEnemies;
 
 	//The UI
 	public GameObject buildButton;
@@ -29,11 +35,17 @@ public class Grid : MonoBehaviour {
 	List<GameObject> spawnTiles = new List<GameObject>();
 
 	List<Vector3> directions;
+
+	GameObject towerHolder;
+	GameObject enemyHolder;
 	// Use this for initialization
 	ClickStates clickState = ClickStates.None;
 	void Start () {
 		instance = this;
 		int tileNum = 1;
+		GameObject gridHolder = new GameObject ("Grid");
+		towerHolder = new GameObject ("Towers");
+		enemyHolder = new GameObject ("Enemies");
 		tiles = new Tile[(int)gridSize.x, (int)gridSize.y];
 		allTiles = new GameObject[(int)gridSize.x, (int)gridSize.y + 1];
 		for (int i = 0; i < gridSize.y; i++) {
@@ -44,20 +56,24 @@ public class Grid : MonoBehaviour {
 				tileNum++;
 				tiles[i, j] = tile.GetComponent<Tile>();
 				allTiles [i, j+1] = tile;
+				tile.transform.parent = gridHolder.transform;
 			}
 
 			GameObject spawn = Instantiate (spawnPrefab);
 			spawn.transform.position = startPosition + new Vector3 (i, 0, -1);
 			spawnTiles.Add (spawn);
+			spawn.transform.parent = gridHolder.transform;
 			allTiles [i, 0] = spawn.gameObject;
 		}
-		SpawnEnemy (enemyPrefab);
+
 		directions = new List<Vector3> ();
 		directions.Add (new Vector3 (1, 0, 0));
 		directions.Add (new Vector3 (0, 0, 1));
 		directions.Add (new Vector3 (-1, 0, 0));
 		directions.Add (new Vector3 (0, 0, -1));
 		cancelButton.SetActive (false);
+
+		InvokeRepeating ("SpawnEnemy", 0.25f, spawnTime);
 	}
 
 	// Update is called once per frame
@@ -86,6 +102,7 @@ public class Grid : MonoBehaviour {
 						if (!selectedTile.Occupied) {
 							//Place down a tower
 							selectedTile.Occupant = clickState == ClickStates.BuildTurret ? Instantiate (towerPrefab) : Instantiate (wallPrefab);
+							selectedTile.Occupant.transform.parent = towerHolder.transform;
 							selectedTile.Selected = false;
 							selectedTile = null;
 							ClickState = ClickStates.None;
@@ -128,9 +145,13 @@ public class Grid : MonoBehaviour {
 	/// Spawns the enemy.
 	/// </summary>
 	/// <param name="go">The prefab of the enemy to be spawned.</param>
-	void SpawnEnemy(GameObject go) {
-		GameObject enemy = Instantiate (go);
-		go.transform.position = spawnTiles.RandomElement ().transform.position;
+	void SpawnEnemy() {
+		if (EnemyManager.Instance.Enemies.Count < maxEnemies) {
+			GameObject enemy = Instantiate (enemiePrefabs.RandomElement ());
+			enemy.transform.position = spawnTiles.RandomElement ().transform.position;
+			EnemyManager.Instance.Enemies.AddExclusive (enemy);
+			enemy.transform.parent = enemyHolder.transform;
+		}
 	}
 
 	public Tile GetTileAt(Vector3 v) {
@@ -159,6 +180,15 @@ public class Grid : MonoBehaviour {
 		Tile start = GetTileAt (startPos);
 		Vector3 dest = new Vector3 (startPos.x, startPos.y, (startPosition.x + gridSize.y));
 		Tile goal = GetTileAt(dest);
+		int offset = 1;
+		while (goal.Occupied) {
+			dest = new Vector3 (startPos.x + offset, startPos.y, (startPosition.x + gridSize.y));
+			goal = GetTileAt(dest);
+			offset *= -1;
+			if (offset > 0) {
+				offset++;
+			}
+		}
 		List<Tile> closedSet = new List<Tile> ();
 		List<Tile> openSet = new List<Tile> ();
 		openSet.Add (start);

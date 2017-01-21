@@ -42,17 +42,20 @@ public class Health : MonoBehaviour {
         newScale.x = currentHealth / maxHealth * originalScale;
         healthBar.localScale = newScale;
 
-        //Test if the current health of the enemy is less than 0
-        //Destroy the enemy
-        if (currentHealth <= 0)
-        {
-            Destroy(gameObject);
-        }
+        
 	}
 
     //Deal damage to the enemy
     public void TakeDamage(float amount) {
         currentHealth -= amount;
+
+		//Test if the current health of the enemy is less than 0
+		//Destroy the enemy
+		if (currentHealth <= 0)
+		{
+			EnemyManager.Instance.Enemies.Remove (gameObject);
+			Destroy(gameObject);
+		}
     }
 
     //Heal the enemy
