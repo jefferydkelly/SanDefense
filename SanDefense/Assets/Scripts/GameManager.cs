@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour {
 	private static GameManager instance = null;
@@ -11,6 +12,8 @@ public class GameManager : MonoBehaviour {
     [SerializeField]
 	int maxCastleHP;
 	int waveNumber;
+	[SerializeField]
+	int maxWaves = 10;
 	WaveState waveState;
 	ImageBoxWithBackground msgBox;
 	public Slider castleHealthDisplay;
@@ -60,7 +63,7 @@ public class GameManager : MonoBehaviour {
 			hpText.text = maxCastleHP + " / " + maxCastleHP;
 
 
-			StartWave ();
+			StartSetup ();
 		} else if (paused) {
 			paused = false;
 		}
@@ -86,7 +89,7 @@ public class GameManager : MonoBehaviour {
 		msgBox.Text = "Wave " + waveNumber + " Start";
 		Invoke ("HideMessage", 2.0f);
 		Grid.TheGrid.StartWave ();
-		currentCoroutine = StartCoroutine (gameObject.RunAfter(endWaveDelegate, 15 * (waveNumber + 1)));
+		currentCoroutine = StartCoroutine (gameObject.RunAfter(endWaveDelegate, 30 * (waveNumber + 1)));
 	}
 
 	void EndWave() {
@@ -104,8 +107,14 @@ public class GameManager : MonoBehaviour {
 		Invoke ("HideMessage", 2.0f);
 		waveState = WaveState.SetUp;
 		waveNumber++;
-		waveDisplay.value = waveNumber;
-		currentCoroutine = StartCoroutine (gameObject.RunAfter(startWaveDelegate, 15));
+		if (waveNumber < maxWaves) {
+			waveText.text = waveNumber + " / " + maxWaves;
+			waveDisplay.value = waveNumber;
+			currentCoroutine = StartCoroutine (gameObject.RunAfter (startWaveDelegate, 15));
+		} else {
+			SceneManager.LoadScene ("GameOver");
+		}
+
 	}
 	/// <summary>
 	/// Damages the castle.  If Castle HP drops below 0, the game's over.
@@ -116,7 +125,7 @@ public class GameManager : MonoBehaviour {
 		castleHealthDisplay.value = curCastleHP;
 		hpText.text = curCastleHP + " / " + maxCastleHP;
 		if (curCastleHP < 0) {
-			Debug.Log ("Game over, man!  Game over");
+			SceneManager.LoadScene ("GameOver");
 		}
 	}
 
