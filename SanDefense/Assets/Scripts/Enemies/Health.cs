@@ -14,7 +14,9 @@ public class Health : MonoBehaviour {
     private float originalScale;
     private Transform healthBar;
 
-    ParticleSystem particleSystem;
+    public GameObject SandDollar;
+
+    private ParticleSystem particleSystem;
 
     public float CurHealth
     {
@@ -58,6 +60,7 @@ public class Health : MonoBehaviour {
 		//Destroy the enemy
 		if (currentHealth <= 0)
 		{
+            Instantiate(SandDollar, transform.position, Quaternion.identity);
 			EnemyManager.Instance.Enemies.Remove (gameObject);
 			Destroy(gameObject);
 		}
