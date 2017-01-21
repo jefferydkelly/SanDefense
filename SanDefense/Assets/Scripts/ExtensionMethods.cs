@@ -23,6 +23,18 @@ public static class ExtensionMethods {
 	}
 
 	/// <summary>
+	/// Adds the passed object into the List if it is not already there.
+	/// </summary>
+	/// <param name="l">L.</param>
+	/// <param name="t">T.</param>
+	/// <typeparam name="T">The 1st type parameter.</typeparam>
+	public static void AddExclusive<T>(this List<T> l, T t) {
+		if (!l.Contains (t)) {
+			l.Add (t);
+		}
+	}
+
+	/// <summary>
 	/// Rotates the Vector2 by the given degrees.
 	/// </summary>
 	/// <returns>The deg.</returns>
