@@ -46,12 +46,12 @@ public class Health : MonoBehaviour {
 	}
 
     //Deal damage to the enemy
-    void hit(int amount) {
+    public void TakeDamage(float amount) {
         currentHealth -= amount;
     }
 
     //Heal the enemy
-    void heal(int amount)
+    void Heal(float amount)
     {
         currentHealth += amount;
     }

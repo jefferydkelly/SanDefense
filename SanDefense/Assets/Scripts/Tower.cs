@@ -28,7 +28,7 @@ public class Tower : MonoBehaviour
     [Range(0, 3)]
     public float attackCooldown = 1;
 
-    [Range(0.5f,10)]
+    //[Range(0.5f,10)]
     public float bulletSpeed = 2;
 
     [Range(3, 20)]
