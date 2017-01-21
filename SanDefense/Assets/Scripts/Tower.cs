@@ -43,6 +43,7 @@ public class Tower : MonoBehaviour
     private Vector3 targetForward;
 
 	Renderer myRenderer;
+	Renderer headRenderer;
 
     // Use this for initialization
     void Start()
@@ -57,12 +58,14 @@ public class Tower : MonoBehaviour
 
         radiusSqr = Mathf.Pow(radius, 2);
 		myRenderer = GetComponent<Renderer> ();
+		headRenderer = turretHead.GetComponentInChildren<Renderer> ();
     }
 
     // Update is called once per frame
     void Update()
     {
         enemies = GameObject.FindGameObjectsWithTag("Enemy");
+
         DetermineTarget();
 
         targetForward = head.forward;
@@ -173,6 +176,7 @@ public class Tower : MonoBehaviour
 	public bool Highlighted {
 		set {
 			myRenderer.material.color = value ? Color.red : Color.white;
+			headRenderer.material.color = value ? Color.red : Color.white;
 		}
 	}
 }
