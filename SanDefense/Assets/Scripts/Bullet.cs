@@ -27,12 +27,12 @@ public class Bullet : MonoBehaviour
     {
         if (target)
         {
-			if (!GameManager.Instance.IsPaused) {
-				transform.position += maxSpeed * (target.transform.position - transform.position).normalized * Time.deltaTime;
-	            
-	            if (timer > timeToDestroy) Destroy(gameObject);
-	            else timer += Time.deltaTime;
-			}
+			       if (!GameManager.Instance.IsPaused) {
+				           transform.position += maxSpeed * (target.transform.position - transform.position).normalized * Time.deltaTime;
+
+	                  if (timer > timeToDestroy) Destroy(gameObject);
+	                   else timer += Time.deltaTime;
+			         }
         }
         else
         {
