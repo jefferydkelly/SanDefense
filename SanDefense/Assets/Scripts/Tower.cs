@@ -62,19 +62,20 @@ public class Tower : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        DetermineTarget();
+		if (!GameManager.Instance.IsPaused) {
+			DetermineTarget ();
 
-        targetForward = head.forward;
+			targetForward = head.forward;
 
-        if (target)
-        {
-            DetermineDirection();
-            head.forward = Vector3.Lerp(head.forward, targetForward, .6f);
-            Shoot();
-        }
+			if (target) {
+				DetermineDirection ();
+				head.forward = Vector3.Lerp (head.forward, targetForward, .6f);
+				Shoot ();
+			}
 
 
-        timer += Time.deltaTime;
+			timer += Time.deltaTime;
+		}
     }
 
     void DetermineTarget()
