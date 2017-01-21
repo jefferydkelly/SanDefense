@@ -1,21 +1,28 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 public class Grid : MonoBehaviour {
 	public Vector3 startPosition = new Vector3(-5, 0, -5);
-
 	/// <summary>
 	/// Prefabs
 	/// </summary>
 	public GameObject tilePrefab;
 	public GameObject spawnPrefab;
 	public GameObject enemyPrefab;
+	public GameObject towerPrefab;
+	public GameObject wallPrefab;
 
+	//The UI
+	public GameObject buildButton;
+	public GameObject destroyButton;
+	public GameObject upgradeButton;
+	public GameObject cancelButton;
 	private static Grid instance;
 	public Vector2 gridSize = new Vector2(10, 10);
 
 	Tile selectedTile;
+	Tower selectedTower;
 
 	Tile[,] tiles;
 	GameObject[,] allTiles;
@@ -23,6 +30,7 @@ public class Grid : MonoBehaviour {
 
 	List<Vector3> directions;
 	// Use this for initialization
+	ClickStates clickState = ClickStates.None;
 	void Start () {
 		instance = this;
 		int tileNum = 1;
@@ -49,37 +57,69 @@ public class Grid : MonoBehaviour {
 		directions.Add (new Vector3 (0, 0, 1));
 		directions.Add (new Vector3 (-1, 0, 0));
 		directions.Add (new Vector3 (0, 0, -1));
-
+		cancelButton.SetActive (false);
 	}
 
 	// Update is called once per frame
 	void Update () {
 
-		Vector3 mousePosition = Input.mousePosition;
-		mousePosition.z = 10;
-		mousePosition = Camera.main.ScreenToWorldPoint (mousePosition);
-		mousePosition.y = 10;
+		if (clickState != ClickStates.None) {
+			Vector3 mousePosition = Input.mousePosition;
+			mousePosition.z = 10;
+			mousePosition = Camera.main.ScreenToWorldPoint (mousePosition);
+			mousePosition.y = 10;
 
-		RaycastHit hit;
+			RaycastHit hit;
 
-		if (Physics.Raycast (mousePosition, Vector3.down, out hit, 10, 1 << LayerMask.NameToLayer("Tiles"))) {
-			if (hit.collider.gameObject != selectedTile) {
-				if (selectedTile != null) {
+			if (clickState == ClickStates.BuildTurret || clickState == ClickStates.BuildWall) {
+				if (Physics.Raycast (mousePosition, Vector3.down, out hit, 10, 1 << LayerMask.NameToLayer ("Tiles"))) {
+					if (hit.collider.gameObject != selectedTile) {
+						if (selectedTile != null) {
+							selectedTile.Selected = false;
+						}
+						selectedTile = hit.collider.GetComponent<Tile> ();
+						selectedTile.Selected = true;
+					}
+
+					if (Input.GetMouseButtonDown (0)) {
+				
+						if (!selectedTile.Occupied) {
+							//Place down a tower
+							selectedTile.Occupant = clickState == ClickStates.BuildTurret ? Instantiate (towerPrefab) : Instantiate (wallPrefab);
+							selectedTile.Selected = false;
+							selectedTile = null;
+							ClickState = ClickStates.None;
+						}
+					}
+
+				} else if (selectedTile != null) {
 					selectedTile.Selected = false;
 				}
-				selectedTile = hit.collider.GetComponent<Tile> ();
-				selectedTile.Selected = true;
-			}
+			} else {
+				if (Physics.Raycast (mousePosition, Vector3.down, out hit, 10, 1 << LayerMask.NameToLayer ("Structures"))) {
+					if (hit.collider.gameObject != selectedTower) {
+						if (selectedTower != null) {
+							selectedTower.Highlighted = false;
+						}
+						selectedTower = hit.collider.GetComponent<Tower> ();
+						selectedTower.Highlighted = true;
+					}
 
-			if (Input.GetMouseButtonDown (0)) {
-				
-				if (!selectedTile.Occupied) {
-					//Place down a tower
+					if (Input.GetMouseButtonDown (0)) {
+
+						if (clickState == ClickStates.DestroyTurret) {
+							Destroy (selectedTower.gameObject);
+							ClickState = ClickStates.None;
+							//Refund the cost of the object
+						} else {
+							//Upgrade the turret
+						}
+					}
+
+				} else if (selectedTower != null) {
+					selectedTower.Highlighted = false;
 				}
 			}
-
-		} else if (selectedTile != null) {
-			selectedTile.Selected = false;
 		}
 
 	}
@@ -207,11 +247,9 @@ public class Grid : MonoBehaviour {
 		totalPath.Add (current);
 		Vector3 gridPos = current.transform.position - startPosition;
 		int index = (int)(gridPos.z * gridSize.y + gridPos.x);
-		current.Selected = true;
 
 		while (cameFrom [index] != null) {
 			current = cameFrom [index];
-			current.Selected = true;
 			gridPos = current.transform.position - startPosition;
 			index = (int)(gridPos.z * gridSize.y + gridPos.x);
 			totalPath.Add (current);
@@ -220,4 +258,35 @@ public class Grid : MonoBehaviour {
 		totalPath.Reverse ();
 		return totalPath;
 	}
+
+	public void SetClickState(string cs) {
+		ClickState = (ClickStates)System.Enum.Parse (typeof(ClickStates), cs);
+	}
+
+	ClickStates ClickState {
+		get {
+			return clickState;
+		}
+
+		set {
+			clickState = value;
+			HideButtons (clickState != ClickStates.None);
+		}
+	}
+
+	void HideButtons(bool hideBuildUpgradeDestory) {
+		cancelButton.SetActive(hideBuildUpgradeDestory);
+		buildButton.SetActive(!hideBuildUpgradeDestory);
+		upgradeButton.SetActive(!hideBuildUpgradeDestory);
+		destroyButton.SetActive(!hideBuildUpgradeDestory);
+
+	}
+}
+
+public enum ClickStates {
+	None,
+	BuildTurret,
+	BuildWall,
+	UpgradeTurret,
+	DestroyTurret
 }

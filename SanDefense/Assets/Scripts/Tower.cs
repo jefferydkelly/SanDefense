@@ -28,7 +28,7 @@ public class Tower : MonoBehaviour
     [Range(0, 3)]
     public float attackCooldown = 1;
 
-    [Range(0.5f,10)]
+    //[Range(0.5f,10)]
     public float bulletSpeed = 2;
 
     [Range(3, 20)]
@@ -42,6 +42,7 @@ public class Tower : MonoBehaviour
     private float timer = 0;
     private Vector3 targetForward;
 
+	Renderer myRenderer;
 
     // Use this for initialization
     void Start()
@@ -52,15 +53,17 @@ public class Tower : MonoBehaviour
             head = turretHead.transform;
         else head = transform;
 
-        enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        enemies = EnemyManager.Instance.Enemies;
 
         radiusSqr = Mathf.Pow(radius, 2);
+		myRenderer = GetComponent<Renderer> ();
     }
 
     // Update is called once per frame
     void Update()
     {
-        enemies = GameObject.FindGameObjectsWithTag("Enemy");
+
+        enemies = EnemyManager.Instance.Enemies;
         DetermineTarget();
 
         targetForward = head.forward;
@@ -68,11 +71,11 @@ public class Tower : MonoBehaviour
         if (target)
         {
             DetermineDirection();
+            head.forward = Vector3.Lerp(head.forward, targetForward, .6f);
             Shoot();
         }
 
 
-        head.forward = Vector3.Lerp(head.forward, targetForward, .5f);
         timer += Time.deltaTime;
     }
 
@@ -81,10 +84,32 @@ public class Tower : MonoBehaviour
         switch (attackStyle)
         {
             case AttackStyle.AttackLowest:
+
+                //refreshes target
                 target = null;
+                float lowestHealth = float.MaxValue;
+
+                //searches for target with lowest health
+                foreach (GameObject enemy in enemies)
+                {
+                    if (enemy)
+                    {
+                        Vector3 dist = enemy.transform.position - transform.position;
+                        dist.y = 0;
+
+                        if (dist.sqrMagnitude < radiusSqr && dist.magnitude < radius &&
+                            enemy.GetComponent<Health>().CurHealth < lowestHealth)
+                        {
+                            target = enemy;
+                            lowestHealth = enemy.GetComponent<Health>().CurHealth;
+                        }
+                    }
+                }
                 break;
 
             case AttackStyle.AttackFurthest:
+
+                //refreshes target
                 target = null;
                 float furthestDist = 0;
 
@@ -95,7 +120,6 @@ public class Tower : MonoBehaviour
                     if (enemy)
                     {
                         Vector3 dist = enemy.transform.position - transform.position;
-
                         dist.y = 0;
 
                         //print(dist.magnitude + " " + radius);
@@ -113,26 +137,42 @@ public class Tower : MonoBehaviour
                         }
                     }
                 }
-                break;
-            case AttackStyle.AttackFirstEnemy:
 
-                //breaks if already havew target
-                if (target) break;
+                break;
+
+            case AttackStyle.AttackFirstEnemy:
+                if (target)
+                {
+                    //checks if target is still in range
+                    Vector3 dist = target.transform.position - transform.position;
+                    dist.y = 0;
+
+                    //if in range break out of switch
+                    if (dist.sqrMagnitude < radiusSqr && dist.magnitude < radius)
+                        break;
+                    else target = null; //resets target and search for new one
+                }
+
+                //search for a new target
                 foreach (GameObject enemy in enemies)
                 {
                     //check if enemy is dead
                     if (enemy)
                     {
                         Vector3 dist = enemy.transform.position - transform.position;
+                        dist.y = 0;
 
                         if (dist.sqrMagnitude < radiusSqr && dist.magnitude < radius)
                         {
-
+                            target = enemy;
+                            break;
                         }
                         else continue;
                     }
                 }
+
                 break;
+
         }
     }
 
@@ -145,7 +185,7 @@ public class Tower : MonoBehaviour
         if (shootStyle == ShootStyle.Lob)
         {
             targetForward = (targetForward + Vector3.up).normalized;
-        } 
+        }
     }
 
     /// <summary>
@@ -167,4 +207,10 @@ public class Tower : MonoBehaviour
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, radius);
     }
+
+	public bool Highlighted {
+		set {
+			myRenderer.material.color = value ? Color.red : Color.white;
+		}
+	}
 }

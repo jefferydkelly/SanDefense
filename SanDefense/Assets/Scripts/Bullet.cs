@@ -14,6 +14,8 @@ public class Bullet : MonoBehaviour
 
     Rigidbody rb;
 
+
+
     public void Initialize(GameObject target, float speed, float damage)
     {
         this.target = target;
@@ -28,11 +30,14 @@ public class Bullet : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (target)
         {
-            rb.AddForce(maxSpeed * (target.transform.position - transform.position).normalized - rb.velocity);
+			//JD: I tested this just to see what it would look like if it went directly at the enemy instead of looping around like yours.
+			//rb.velocity = maxSpeed * (target.transform.position - transform.position).normalized;
+            
+			rb.AddForce(maxSpeed * (target.transform.position - transform.position).normalized - rb.velocity);
 
             if (timer > timeToDestroy) Destroy(gameObject);
             else timer += Time.deltaTime;
@@ -44,12 +49,11 @@ public class Bullet : MonoBehaviour
         }
     }
 
-    void OnCollisionEnter(Collision collision)
+    void OnTriggerEnter(Collider collision)
     {
         if (collision.gameObject.tag == "Enemy")
         {
-            //collision.gameObject.GetComponent<Health>().TakeDamage(damage);
-            //Destroy(collision.gameObject);
+            collision.gameObject.GetComponent<Health>().TakeDamage(damage);
             Destroy(gameObject);
         }
     }

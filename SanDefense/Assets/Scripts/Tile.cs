@@ -37,7 +37,6 @@ public class Tile : MonoBehaviour {
 		set {
 			occupant = value;
 			occupant.transform.position = transform.position;
-			Selected = true;
 		}
 	}
 

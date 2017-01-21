@@ -14,6 +14,11 @@ public class Health : MonoBehaviour {
     private float originalScale;
     private Transform healthBar;
 
+    public float CurHealth
+    {
+        get { return currentHealth; }
+    }
+
 	// Use this for initialization
 	void Start () {
 
@@ -46,12 +51,12 @@ public class Health : MonoBehaviour {
 	}
 
     //Deal damage to the enemy
-    void hit(int amount) {
+    public void TakeDamage(float amount) {
         currentHealth -= amount;
     }
 
     //Heal the enemy
-    void heal(int amount)
+    void Heal(float amount)
     {
         currentHealth += amount;
     }
