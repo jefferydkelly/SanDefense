@@ -28,6 +28,8 @@ public class GameManager : MonoBehaviour {
 	WaitDelegate endWaveDelegate;
 	WaitDelegate startSetupDelegate;
 
+	bool won = false;
+
 	// Use this for initialization
 	void Start () {
 		if (instance == null) {
@@ -45,6 +47,7 @@ public class GameManager : MonoBehaviour {
 			startSetupDelegate = () => {
 				StartSetup();
 			};
+			DontDestroyOnLoad (gameObject);
 		} else {
 			Destroy (gameObject);
 		}
@@ -81,7 +84,7 @@ public class GameManager : MonoBehaviour {
 			}
 		}
 
-        moneyText.text = "\t" + moneyAmount.ToString();
+        
 	}
 	void StartWave() {
 		
@@ -112,6 +115,7 @@ public class GameManager : MonoBehaviour {
 			waveDisplay.value = waveNumber;
 			currentCoroutine = StartCoroutine (gameObject.RunAfter (startWaveDelegate, 15));
 		} else {
+			won = true;
 			SceneManager.LoadScene ("GameOver");
 		}
 
@@ -152,9 +156,15 @@ public class GameManager : MonoBehaviour {
 		UIManager.Instance.SetGameState ("Game");
 	}
 
+	public bool WonGame {
+		get {
+			return won;
+		}
+	}
     public void funds(int price)
     {
         moneyAmount += price;
+		moneyText.text = "\t" + moneyAmount.ToString();
     }
 }
 
