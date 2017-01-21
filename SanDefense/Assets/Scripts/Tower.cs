@@ -19,6 +19,7 @@ public class Tower : MonoBehaviour
 
     public GameObject bullet; //prefab of bullet to
     public GameObject turretHead; //this turns and shoot, if none use the game object this is attached to to turn
+    public GameObject barrelTip;
     public AttackStyle attackStyle = AttackStyle.AttackLowest; //algorithm to determine the target
     public ShootStyle shootStyle = ShootStyle.Straight;
 
@@ -69,7 +70,7 @@ public class Tower : MonoBehaviour
 
 			if (target) {
 				DetermineDirection ();
-				head.forward = Vector3.Lerp (head.forward, targetForward, .6f);
+				head.forward = Vector3.Lerp (head.forward, -targetForward, .6f);
 				Shoot ();
 			}
 
@@ -190,7 +191,7 @@ public class Tower : MonoBehaviour
     {
         if (timer > attackCooldown)
         {
-            Bullet bul = (Instantiate(bullet, head.transform.position, head.transform.rotation, transform)).GetComponent<Bullet>();
+            Bullet bul = (Instantiate(bullet, barrelTip.transform.position, head.transform.rotation, transform)).GetComponent<Bullet>();
             bul.Initialize(target, bulletSpeed, damage);
             timer = 0;
         }
