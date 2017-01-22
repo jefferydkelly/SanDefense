@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviour {
 			msgBox.Enabled = false;
 			hpText = castleHealthDisplay.GetComponentInChildren<Text>();
 			waveText = waveDisplay.GetComponentInChildren<Text> ();
-
+			moneyText.text = "\t" + moneyAmount.ToString();
             startWaveDelegate = () => {
 				StartWave ();
 			};
@@ -58,7 +58,7 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
-	public void StartGame() {
+	public IEnumerator StartGame() {
 		if (!gameRunning) {
 			gameRunning = true;
 			paused = false;
@@ -71,7 +71,7 @@ public class GameManager : MonoBehaviour {
 
 
 			hpText.text = maxCastleHP + " / " + maxCastleHP;
-
+			yield return StartCoroutine(wave.GetComponent<Wave> ().RollTide (1));//randomWaveSize(waveNumber + 1);
 
 			StartSetup ();
 		} else if (paused) {
@@ -107,7 +107,7 @@ public class GameManager : MonoBehaviour {
 
 		Grid.TheGrid.EndWave ();
 
-        wave.GetComponent<wave>().randomWaveSize(waveNumber + 1);
+        //wave.GetComponent<Wave>().randomWaveSize(waveNumber + 1);
 
         currentCoroutine = StartCoroutine (gameObject.RunAfter(startSetupDelegate, 10));
 	}
