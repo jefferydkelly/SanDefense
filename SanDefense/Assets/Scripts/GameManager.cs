@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviour {
 			msgBox.Enabled = false;
 			hpText = castleHealthDisplay.GetComponentInChildren<Text>();
 			waveText = waveDisplay.GetComponentInChildren<Text> ();
-
+			moneyText.text = "\t" + moneyAmount.ToString();
             startWaveDelegate = () => {
 				StartWave ();
 			};
