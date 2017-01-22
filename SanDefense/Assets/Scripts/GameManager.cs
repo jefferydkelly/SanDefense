@@ -169,6 +169,18 @@ public class GameManager : MonoBehaviour {
         moneyAmount += price;
 		moneyText.text = "\t" + moneyAmount.ToString();
     }
+
+	public int CurWave {
+		get {
+			return waveNumber;
+		}
+	}
+
+	public WaveState WaveState {
+		get {
+			return waveState;
+		}
+	}
 }
 
 public enum WaveState {

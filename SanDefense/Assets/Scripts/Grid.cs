@@ -141,6 +141,15 @@ public class Grid : MonoBehaviour {
 					if (Input.GetMouseButtonDown (0)) {
 
 						if (clickState == ClickStates.DestroyTurret) {
+							if (selectedTower.RoundConstructed == GameManager.Instance.CurWave) {
+								if (GameManager.Instance.WaveState == WaveState.SetUp) {
+									GameManager.Instance.funds (25);
+								} else {
+									GameManager.Instance.funds (12);
+								}
+							} else {
+								GameManager.Instance.funds (5);
+							}
 							Destroy (selectedTower.gameObject);
 							ClickState = ClickStates.None;
 							//Refund the cost of the object

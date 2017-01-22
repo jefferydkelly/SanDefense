@@ -22,6 +22,7 @@ public class Tower : MonoBehaviour
     public GameObject barrelTip;
     public AttackStyle attackStyle = AttackStyle.AttackLowest; //algorithm to determine the target
     public ShootStyle shootStyle = ShootStyle.Straight;
+	int roundConstructed = -1;
 
     [Range(0, 500)]
     public float damage = 20;
@@ -58,6 +59,7 @@ public class Tower : MonoBehaviour
         radiusSqr = Mathf.Pow(radius, 2);
 		renderers = GetComponentsInChildren<Renderer> ();
 		regularColor = renderers [0].material.color;
+		roundConstructed = GameManager.Instance.CurWave;
     }
 
     // Update is called once per frame
@@ -210,6 +212,12 @@ public class Tower : MonoBehaviour
 			foreach (Renderer r in renderers) {
 				r.material.color = c;
 			}
+		}
+	}
+
+	public int RoundConstructed {
+		get {
+			return roundConstructed;
 		}
 	}
 }
