@@ -69,6 +69,7 @@ public class Grid : MonoBehaviour {
 				tiles[i, j] = tile.GetComponent<Tile>();
 				allTiles [i, j+1] = tile;
 				tile.transform.parent = gridHolder.transform;
+				tiles [i, j].gridPos = new Vector2 (i, j);
 			}
 
 			GameObject spawn = Instantiate (spawnPrefab);

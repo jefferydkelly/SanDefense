@@ -6,6 +6,7 @@ public class Tile : MonoBehaviour {
 	GameObject occupant;
 	Renderer myRenderer;
 	bool testAsOccupied = false;
+	public Vector2 gridPos;
 	// Use this for initialization
 	void Awake () {
 		myRenderer = GetComponent<Renderer> ();
@@ -66,7 +67,9 @@ public class Tile : MonoBehaviour {
 		
 	void OnMouseEnter() {
 		if (Grid.TheGrid.ClickState == ClickStates.BuildTurret && !Occupied && Grid.TheGrid.IsPathClear(this)) {
-			Grid.TheGrid.SelectedTile = this;
+			if (gridPos.y > 0) {
+				Grid.TheGrid.SelectedTile = this;
+			}
 		}
 	}
 
@@ -78,7 +81,9 @@ public class Tile : MonoBehaviour {
 
 	void OnMouseUp() {
 		if (Selected) {
-			Grid.TheGrid.BuildTower ();
+			if (gridPos.y > 0) {
+				Grid.TheGrid.BuildTower ();
+			}
 		}
 	}
 }
