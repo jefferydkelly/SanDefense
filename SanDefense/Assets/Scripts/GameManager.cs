@@ -98,7 +98,7 @@ public class GameManager : MonoBehaviour {
 			msgBox.Text = "Wave " + waveNumber + " Start";
 			Invoke ("HideMessage", 2.0f);
 			Grid.TheGrid.StartWave ();
-			currentCoroutine = StartCoroutine (gameObject.RunAfter (endWaveDelegate, 30 * (waveNumber + 1)));
+			currentCoroutine = StartCoroutine (gameObject.RunAfter (endWaveDelegate, 15 * (waveNumber + 1)));
 		}
 	}
 
