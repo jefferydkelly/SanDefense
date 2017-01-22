@@ -16,7 +16,7 @@ public class Wave : MonoBehaviour {
 	}
 
 	public IEnumerator RollTide(int level) {
-		int zDif = Random.Range (2, Mathf.Min(level + 3, 6)) * 2;
+		int zDif = Random.Range (1, Mathf.Min(level + 3, 6)) * 2;
 		waveSize = transform.position + new Vector3(0, 0, zDif);
 		yield return StartCoroutine (MoveForward());
 		if (level > 1) {
