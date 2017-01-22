@@ -184,7 +184,7 @@ public class GameManager : MonoBehaviour {
 
 		set {
 			moneyAmount = value;
-			moneyText.text = "Sand Dollars" + moneyAmount.ToString();
+			moneyText.text = "Sand Dollars: " + moneyAmount.ToString();
 		}
 	}
 
