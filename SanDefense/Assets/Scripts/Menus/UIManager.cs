@@ -26,7 +26,7 @@ public class UIManager : MonoBehaviour {
 			Destroy (gameObject);
 		}
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
 
@@ -48,9 +48,10 @@ public class UIManager : MonoBehaviour {
 
 			mainMenu.SetActive(gameState == GameStates.MainMenu);
 			credits.SetActive(gameState == GameStates.Credits);
-            instructions.SetActive(gameState == GameStates.Instructions);
-            pause.SetActive(gameState == GameStates.Pause);
-        }
+      instructions.SetActive(gameState == GameStates.Instructions);
+
+      pause.SetActive(gameState == GameStates.Pause);
+    }
 	}
 	public void SetGameState(string s) {
 		GameState = (GameStates)System.Enum.Parse (typeof(GameStates), s);

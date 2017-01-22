@@ -317,7 +317,7 @@ public class Grid : MonoBehaviour {
 	void SpawnEnemy() {
 		if (EnemyManager.Instance.Enemies.Count < maxEnemies) {
 			GameObject enemy = Instantiate (enemiePrefabs.RandomElement ());
-			enemy.transform.position = spawnTiles.RandomElement ().transform.position;
+			enemy.transform.position = spawnTiles.RandomElement ().transform.position + new Vector3(0, enemy.GetComponent<Collider>().bounds.extents.y);
 			EnemyManager.Instance.Enemies.AddExclusive (enemy);
 			enemy.transform.parent = enemyHolder.transform;
 		}
@@ -479,6 +479,7 @@ public class Grid : MonoBehaviour {
 			current = cameFrom [index];
 			gridPos = current.transform.position - startPosition;
 			index = (int)(gridPos.z * gridSize.y + gridPos.x);
+
 			totalPath.Add (current);
 		}
 
@@ -507,6 +508,13 @@ public class Grid : MonoBehaviour {
 		upgradeButton.SetActive(!hideBuildUpgradeDestory);
 		destroyButton.SetActive(!hideBuildUpgradeDestory);
 
+	}
+
+	public void HideAllButtons() {
+		cancelButton.SetActive(false);
+		buildButton.SetActive(false);
+		upgradeButton.SetActive(false);
+		destroyButton.SetActive(false);
 	}
 }
 

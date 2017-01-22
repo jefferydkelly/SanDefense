@@ -36,6 +36,8 @@ public class Movement : MonoBehaviour {
 					} else if (!path [0].Occupied) {
 						Tile dest = path [0];
 						fwd = dest.transform.position - lastTilePos;
+						fwd.y = 0;
+						fwd.Normalize ();
 						transform.position = lastTilePos;
 						path.Remove (dest);
 
@@ -47,6 +49,8 @@ public class Movement : MonoBehaviour {
 						path = Grid.TheGrid.CalcPathToCastle (lastTilePos);
 						Tile dest = path [0];
 						fwd = dest.transform.position - lastTilePos;
+						fwd.y = 0;
+						fwd.Normalize ();
 						transform.position = lastTilePos;
 						path.Remove (dest);
 					}
@@ -54,6 +58,8 @@ public class Movement : MonoBehaviour {
 					path = Grid.TheGrid.CalcPathToCastle (lastTilePos);
 					Tile dest = path [0];
 					fwd = dest.transform.position - lastTilePos;
+					fwd.y = 0;
+					fwd.Normalize ();
 					transform.position = lastTilePos;
 					path.Remove (dest);
 				}
