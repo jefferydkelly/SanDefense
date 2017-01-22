@@ -48,6 +48,10 @@ public class Tile : MonoBehaviour {
 		set {
 			myRenderer.material.color = value ? Color.red : Color.white;
 		}
+
+		get {
+			return myRenderer.material.color == Color.red;
+		}
 	}
 
 	public bool TestAsOccupied {
@@ -57,6 +61,24 @@ public class Tile : MonoBehaviour {
 
 		set {
 			testAsOccupied = value;
+		}
+	}
+		
+	void OnMouseEnter() {
+		if (Grid.TheGrid.ClickState == ClickStates.BuildTurret && !Occupied && Grid.TheGrid.IsPathClear(this)) {
+			Grid.TheGrid.SelectedTile = this;
+		}
+	}
+
+	void OnMouseExit() {
+		if (Grid.TheGrid.ClickState == ClickStates.BuildTurret) {
+			Grid.TheGrid.SelectedTile = null;
+		}
+	}
+
+	void OnMouseUp() {
+		if (Selected) {
+			Grid.TheGrid.BuildTower ();
 		}
 	}
 }

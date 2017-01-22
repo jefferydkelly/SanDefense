@@ -8,20 +8,21 @@ public class Wave : MonoBehaviour {
 	public Vector3 point0;
 
 	Vector3 waveSize;
-
+	Vector3 startScale;
 	// Use this for initialization
 	void Start () {
 		point0 = transform.position;
+		startScale = transform.localScale;
 	}
 
 	public IEnumerator RollTide(int level) {
-		float zDif = Random.Range (1, level + 3) * 2;
+		float zDif = Random.Range (2, Mathf.Min(level + 3, 6.5f)) * 2;
 		waveSize = transform.position + new Vector3(0, 0, zDif);
 		yield return StartCoroutine (MoveForward());
+		yield return new WaitForSeconds (0.5f);
 		yield return StartCoroutine (MoveBackwards());
 
 		if (level > 1) {
-			Debug.Log ("Scatter");
 			Grid.TheGrid.ClearRocks ();
 			Grid.TheGrid.ScatterRocks ();
 		}
@@ -29,14 +30,18 @@ public class Wave : MonoBehaviour {
 
 	IEnumerator MoveForward() {
 		while (transform.position.z < waveSize.z) {
-			transform.position += new Vector3 (0, 0, Time.deltaTime);
+			float scale = (transform.position.z - point0.z) / (waveSize.z - point0.z);
+			transform.position += new Vector3 (0, 0, Time.deltaTime * speed);
+			transform.localScale = new Vector3 (startScale.x, startScale.y * (1 - scale * 0.9f), startScale.z);
 			yield return null;
 		}
 	}
 
 	IEnumerator MoveBackwards() {
 		while (transform.position.z > point0.z) {
-			transform.position -= new Vector3 (0, 0, Time.deltaTime);
+			float scale = (transform.position.z - waveSize.z) / (point0.z - waveSize.z);
+			transform.position -= new Vector3 (0, 0, Time.deltaTime * speed);
+			transform.localScale = new Vector3 (startScale.x, startScale.y * (0.1f + scale * 0.9f), startScale.z);
 			yield return null;
 		}
 	}
