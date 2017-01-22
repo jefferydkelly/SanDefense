@@ -87,41 +87,42 @@ public class Grid : MonoBehaviour {
 	void Update () {
 
 		if (clickState != ClickStates.None) {
-			Vector3 mousePosition = Input.mousePosition;
-			mousePosition.z = Camera.main.transform.position.y;
-			mousePosition = Camera.main.ScreenToWorldPoint (mousePosition);
-			mousePosition.y = Camera.main.transform.position.y;
-
+			Ray mouseRay = Camera.main.ScreenPointToRay (Input.mousePosition);
 			RaycastHit hit;
 
 			if (clickState == ClickStates.BuildTurret || clickState == ClickStates.BuildWall) {
-				if (Physics.Raycast (mousePosition, Vector3.down, out hit, Camera.main.transform.position.y, 1 << LayerMask.NameToLayer ("Tiles"))) {
-					if (hit.collider.gameObject != selectedTile) {
-						if (selectedTile != null) {
-							selectedTile.Selected = false;
-						}
-						selectedTile = hit.collider.GetComponent<Tile> ();
-						selectedTile.Selected = true;
-					}
+				if (Physics.Raycast(mouseRay, out hit, 20, 1 << LayerMask.NameToLayer ("Tiles"))) {
+					Tile newTile = hit.collider.GetComponent<Tile> ();
 
-					if (Input.GetMouseButtonDown (0)) {
-				
-						if (!selectedTile.Occupied && GameManager.Instance.moneyAmount >= 25) {
-							//Place down a tower
-							if (numTurrets < maxTurrets) {
-								GameObject turret = clickState == ClickStates.BuildTurret ? Instantiate (towerPrefab) : Instantiate (wallPrefab);
-								selectedTile.Occupant =  turret;
-								turret.transform.position = selectedTile.transform.position;
-								selectedTile.Occupant.transform.parent = towerHolder.transform;
-
-								numTurrets++;
-
-                                GameManager.Instance.funds(-25);
+					if (IsPathClear (newTile)) {
+						if (hit.collider.gameObject != selectedTile) {
+							if (selectedTile != null) {
+								selectedTile.Selected = false;
 							}
+							selectedTile = newTile;
+							selectedTile.Selected = true;
+						}
+					
+
+						if (Input.GetMouseButtonDown (0)) {
+				
+							if (!selectedTile.Occupied && GameManager.Instance.moneyAmount >= 25) {
+								//Place down a tower
+								if (numTurrets < maxTurrets) {
+									GameObject turret = clickState == ClickStates.BuildTurret ? Instantiate (towerPrefab) : Instantiate (wallPrefab);
+									selectedTile.Occupant = turret;
+									turret.transform.position = selectedTile.transform.position;
+									selectedTile.Occupant.transform.parent = towerHolder.transform;
+
+									numTurrets++;
+
+									GameManager.Instance.funds (-25);
+								}
 								selectedTile.Selected = false;
 								selectedTile = null;
 							
-							ClickState = ClickStates.None;
+								ClickState = ClickStates.None;
+							}
 						}
 					}
 
@@ -129,7 +130,7 @@ public class Grid : MonoBehaviour {
 					selectedTile.Selected = false;
 				}
 			} else {
-				if (Physics.Raycast (mousePosition, Vector3.down, out hit, Camera.main.transform.position.y, 1 << LayerMask.NameToLayer ("Structures"))) {
+				if (Physics.Raycast (mouseRay, out hit, 20, 1 << LayerMask.NameToLayer ("Structures"))) {
 					if (hit.collider.gameObject != selectedTower) {
 						if (selectedTower != null) {
 							selectedTower.Highlighted = false;
@@ -151,6 +152,7 @@ public class Grid : MonoBehaviour {
 								GameManager.Instance.funds (5);
 							}
 							Destroy (selectedTower.gameObject);
+							numTurrets--;
 							ClickState = ClickStates.None;
 							//Refund the cost of the object
 						} else {
@@ -166,6 +168,91 @@ public class Grid : MonoBehaviour {
 
 	}
 
+	bool IsPathClear(Tile tile) {
+		tile.TestAsOccupied = true;
+		Vector3 startPos = tiles [0, 0].transform.position;
+		Vector3 gridPos = startPos - startPosition;
+		int numTiles = (int)gridSize.x * (int)gridSize.y;
+		Tile start = GetTileAt (startPos);
+		Vector3 dest = new Vector3 (startPos.x, startPos.y, (startPosition.x + gridSize.y));
+		Tile goal = GetTileAt(dest);
+		int offset = 1;
+		while (goal.Occupied) {
+			dest = new Vector3 (startPos.x + offset, startPos.y, (startPosition.x + gridSize.y));
+			Tile test = GetTileAt(dest);
+			if (test) {
+				goal = test;
+			}
+			offset *= -1;
+			if (offset > 0) {
+				offset++;
+			}
+		}
+		List<Tile> closedSet = new List<Tile> ();
+		List<Tile> openSet = new List<Tile> ();
+		openSet.Add (start);
+
+		int curIndex = (int)(gridPos.z * gridSize.y + gridPos.x);
+		float[] gScore = new float[numTiles];
+		gScore [curIndex] = 0;
+		float[] fScore = new float[numTiles];
+		Tile[] cameFrom = new Tile[numTiles];
+		for (int i = 0; i < numTiles; i++) {
+			cameFrom [i] = null;
+		}
+
+		for (int i = 0; i < fScore.Length; i++) {
+			fScore [i] = int.MaxValue;
+		}
+
+		fScore [curIndex] = (int)(gridSize.y - startPos.z);
+
+		while (!openSet.IsEmpty ()) {
+			openSet.Sort (delegate(Tile x, Tile y) {
+				Vector3 xPos = x.transform.position - startPosition;
+				int xInd = (int)(xPos.z * gridSize.y + xPos.x);
+				Vector3 yPos = y.transform.position - startPosition;
+				int yInd = (int)(yPos.z * gridSize.y + yPos.x);
+				return fScore[xInd].CompareTo(fScore[yInd]);
+			});
+
+			Tile current = openSet [0];
+			gridPos = current.transform.position - startPosition;
+			curIndex = (int)(gridPos.z * gridSize.y + gridPos.x);
+			if (Vector3.Equals(current.transform.position, goal.transform.position)) {
+				tile.TestAsOccupied = false;
+				return true;
+			}
+
+			openSet.Remove (current);
+			closedSet.Add (current);
+
+			foreach (Tile t in TestNeighbors(current)) {
+
+				if (closedSet.Contains (t)) {
+					continue;
+				}
+				Vector3 newGridPos = t.transform.position - startPosition;
+				int tIndex = (int)(newGridPos.z * gridSize.y + newGridPos.x);
+				float tentativeGScore = gScore [curIndex] + 1;
+
+				if (!openSet.Contains (t)) {
+					openSet.Add (t);
+				} else if (tentativeGScore >= gScore [tIndex]) {
+					continue;
+				}
+
+				cameFrom [tIndex] = current;
+
+				gScore [tIndex] = tentativeGScore;
+				fScore[tIndex] = tentativeGScore + Vector3.Distance(current.transform.position, dest);
+
+			}
+
+		}
+		tile.TestAsOccupied = false;
+		return false;
+	}
 	public void StartWave() {
 		spawnRoutine = StartCoroutine (gameObject.RunAfterRepeating(spawnDelegate, spawnTime));
 	}
@@ -307,6 +394,20 @@ public class Grid : MonoBehaviour {
 		return null;
 	}
 
+	List<Tile> TestNeighbors(Tile t) {
+		List<Tile> neighbors = new List<Tile> ();
+
+		foreach (Vector3 v in directions) {
+			//Judgment Day = t2
+			Tile judgmentday = GetTileAt(t.transform.position + v);
+
+			if (judgmentday && !judgmentday.Occupied && !judgmentday.TestAsOccupied) {
+				neighbors.Add (judgmentday);
+			}
+		}
+
+		return neighbors;
+	}
 	List<Tile> GetNeighbors(Tile t) {
 		List<Tile> neighbors = new List<Tile> ();
 

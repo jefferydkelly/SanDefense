@@ -121,7 +121,7 @@ public class GameManager : MonoBehaviour {
         if (waveNumber < maxWaves) {
 			waveText.text = "\t" + waveNumber + " / " + maxWaves;
 			waveDisplay.value = waveNumber;
-			currentCoroutine = StartCoroutine (gameObject.RunAfter (startWaveDelegate, 15));
+			//currentCoroutine = StartCoroutine (gameObject.RunAfter (startWaveDelegate, 15));
 		} else {
 			won = true;
 			SceneManager.LoadScene ("GameOver");

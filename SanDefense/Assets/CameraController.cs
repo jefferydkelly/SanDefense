@@ -13,8 +13,8 @@ public class CameraController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		Vector3 dir = new Vector3 ((Input.GetKey (KeyCode.D) ? 1 : 0) - (Input.GetKey (KeyCode.A) ? 1 : 0), 0,
-			              (Input.GetKey (KeyCode.W) ? 1 : 0) - (Input.GetKey (KeyCode.S) ? 1 : 0));
+		Vector3 dir = new Vector3 ((Input.GetKey (KeyCode.W) ? 1 : 0) - (Input.GetKey (KeyCode.S) ? 1 : 0), 0,
+			              (Input.GetKey (KeyCode.A) ? 1 : 0) - (Input.GetKey (KeyCode.D) ? 1 : 0));
 
 		dir.Normalize ();
 		dir *= speed;

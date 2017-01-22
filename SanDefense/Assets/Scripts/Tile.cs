@@ -5,6 +5,7 @@ using UnityEngine;
 public class Tile : MonoBehaviour {
 	GameObject occupant;
 	Renderer myRenderer;
+	bool testAsOccupied = false;
 	// Use this for initialization
 	void Awake () {
 		myRenderer = GetComponent<Renderer> ();
@@ -46,6 +47,16 @@ public class Tile : MonoBehaviour {
 	public bool Selected {
 		set {
 			myRenderer.material.color = value ? Color.red : Color.white;
+		}
+	}
+
+	public bool TestAsOccupied {
+		get {
+			return testAsOccupied;
+		}
+
+		set {
+			testAsOccupied = value;
 		}
 	}
 }
