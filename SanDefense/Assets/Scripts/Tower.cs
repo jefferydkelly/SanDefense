@@ -229,8 +229,8 @@ public class Tower : MonoBehaviour
         {
             Bullet bul = (Instantiate(bullet, barrelTip.transform.position, head.transform.rotation)).GetComponent<Bullet>();
             bul.Initialize(target, bulletSpeed, damage);
+            StopCoroutine(PlayAudio());
             StartCoroutine(PlayAudio());
-
             timer = 0;
         }
     }

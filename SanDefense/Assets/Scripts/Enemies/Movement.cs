@@ -13,9 +13,26 @@ public class Movement : MonoBehaviour {
 	float atkTime = 1f;
 	int atkDamage = 1;
 	Tile tile;
+
+    AudioSource audioSrc;
+    
+    void Awake()
+    {
+        audioSrc = GetComponent<AudioSource>();
+        StartCoroutine(PlayWalkAudio());
+    }
+    
 	// Use this for initialization
 	void Start () {
 		lastTilePos = transform.position;
+    }
+
+    IEnumerator PlayWalkAudio()
+    {
+        audioSrc.volume = Random.Range(0.2f,0.3f);
+        audioSrc.pitch = Random.Range(0.8f, 1.2f);
+        audioSrc.Play();
+        yield return null;
     }
 	
 	// Update is called once per frame
@@ -92,6 +109,7 @@ public class Movement : MonoBehaviour {
 
 	void Attack() {
 		GameManager.Instance.DamageCastle (atkDamage);
+        StopCoroutine(PlayWalkAudio());
 	}
 
 	void OnDestroy() {
