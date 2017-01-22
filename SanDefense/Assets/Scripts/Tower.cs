@@ -45,6 +45,7 @@ public class Tower : MonoBehaviour
 	int maxLevel = 3;
     private int level = 1;
 	int cost = 25;
+	int totalSpent = 25;
 
     Renderer[] renderers;
     Color highlightColor = Color.red;
@@ -65,6 +66,12 @@ public class Tower : MonoBehaviour
 
 	public int Cost {
 		get { return cost; }
+	}
+
+	public int TotalSpent {
+		get {
+			return totalSpent;
+		}
 	}
 
     void Awake()
@@ -247,7 +254,7 @@ public class Tower : MonoBehaviour
     {
 		if (level < maxLevel)
         {
-
+			totalSpent += 25 * level;
             level++;
             damage += 10 * level;
             attackCooldown -= 0.02f * level;
