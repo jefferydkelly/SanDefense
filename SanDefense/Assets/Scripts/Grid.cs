@@ -17,6 +17,8 @@ public class Grid : MonoBehaviour {
 	public GameObject rockPrefab;
 
 	[SerializeField]
+	Text towerText;
+	[SerializeField]
 	float spawnTime = 1.0f;
 	[SerializeField]
 	int maxEnemies;
@@ -29,6 +31,7 @@ public class Grid : MonoBehaviour {
 	public GameObject destroyButton;
 	public GameObject upgradeButton;
 	public GameObject cancelButton;
+	public GameObject startButton;
 	private static Grid instance;
 	public Vector2 gridSize = new Vector2(10, 10);
 
@@ -85,100 +88,57 @@ public class Grid : MonoBehaviour {
 		directions.Add (new Vector3 (0, 0, -1));
 		//cancelButton.SetActive (false);
 		ClickState = ClickStates.None;
+		towerText.text = "0 / " + maxTurrets;
 	}
 
-	// Update is called once per frame
-	void Update () {
+	public void BuildTower() {
+		if(GameManager.Instance.Funds >= 25) {
+			//Place down a tower
+			if (numTurrets < maxTurrets) {
+				GameObject turret = clickState == ClickStates.BuildTurret ? Instantiate (towerPrefab) : Instantiate (wallPrefab);
+				selectedTile.Occupant = turret;
+				Vector3 ex = turret.GetComponent<Collider> ().bounds.extents;
+				turret.transform.position = selectedTile.transform.position + new Vector3 (0, ex.y, -ex.z / 2);
+				selectedTile.Occupant.transform.parent = towerHolder.transform;
 
-		if (clickState != ClickStates.None) {
-			Ray mouseRay = Camera.main.ScreenPointToRay (Input.mousePosition);
-			RaycastHit hit;
-
-			if (clickState == ClickStates.BuildTurret || clickState == ClickStates.BuildWall) {
-				if (Physics.Raycast(mouseRay, out hit, 20, 1 << LayerMask.NameToLayer ("Tiles"))) {
-					Tile newTile = hit.collider.GetComponent<Tile> ();
-
-					if (IsPathClear (newTile)) {
-						if (hit.collider.gameObject != selectedTile) {
-							if (selectedTile != null) {
-								selectedTile.Selected = false;
-							}
-							selectedTile = newTile;
-							selectedTile.Selected = true;
-						}
-					
-
-						if (Input.GetMouseButtonDown (0)) {
-				
-							if (!selectedTile.Occupied && GameManager.Instance.moneyAmount >= 25) {
-								//Place down a tower
-								if (numTurrets < maxTurrets) {
-									GameObject turret = clickState == ClickStates.BuildTurret ? Instantiate (towerPrefab) : Instantiate (wallPrefab);
-									selectedTile.Occupant = turret;
-									turret.transform.position = selectedTile.transform.position;
-									selectedTile.Occupant.transform.parent = towerHolder.transform;
-
-									numTurrets++;
-
-									GameManager.Instance.funds (-25);
-								}
-								selectedTile.Selected = false;
-								selectedTile = null;
-							
-								ClickState = ClickStates.None;
-							}
-						}
-					}
-
-				} else if (selectedTile != null) {
-					selectedTile.Selected = false;
-				}
-			} else {
-				if (Physics.Raycast (mouseRay, out hit, 20, 1 << LayerMask.NameToLayer ("Structures"))) {
-					if (hit.collider.gameObject != selectedTower) {
-						if (selectedTower != null) {
-							selectedTower.Highlighted = false;
-						}
-						selectedTower = hit.collider.GetComponent<Tower> ();
-						selectedTower.Highlighted = true;
-					}
-
-					if (Input.GetMouseButtonDown (0)) {
-
-						if (clickState == ClickStates.DestroyTurret) {
-							if (selectedTower.RoundConstructed == GameManager.Instance.CurWave) {
-								if (GameManager.Instance.WaveState == WaveState.SetUp) {
-									GameManager.Instance.funds (25);
-								} else {
-									GameManager.Instance.funds (12);
-								}
-							} else {
-								GameManager.Instance.funds (5);
-							}
-
-                        selectedTower.Destroy();
-                        numTurrets--;
-                        ClickState = ClickStates.None;
-                        //Refund the cost of the object
-                    }
-                    else if (GameManager.Instance.moneyAmount >= 25 * selectedTower.Level && selectedTower.Level < 3)
-                    {
-                        GameManager.Instance.funds(-25 * selectedTower.Level);
-                        selectedTower.Upgrade();
-						ClickState = ClickStates.None;
-						selectedTower.Highlighted = false;
-						selectedTower = null;
-                    }
-                }
-
-				} else if (selectedTower != null) {
-					selectedTower.Highlighted = false;
-				}
+				numTurrets++;
+				towerText.text = numTurrets + " / " + maxTurrets;
+				GameManager.Instance.Funds -= 25;
 			}
+
+			SelectedTile = null;
+
+			ClickState = ClickStates.None;
+		}
+	}
+
+	public void UpgradeTower() {
+		if (GameManager.Instance.Funds >= 25 * selectedTower.Level && selectedTower.Level < 3)
+		{
+			GameManager.Instance.Funds -= 25 * selectedTower.Level;
+			selectedTower.Upgrade();
+			ClickState = ClickStates.None;
+			SelectedTower = null;
+		}
+	}
+
+	public void DemolishTower() {
+		if (selectedTower.RoundConstructed == GameManager.Instance.CurWave) {
+			if (GameManager.Instance.WaveState == WaveState.SetUp) {
+				GameManager.Instance.Funds += 25;
+			} else {
+				GameManager.Instance.Funds += 12;
+			}
+		} else {
+			GameManager.Instance.Funds += 5;
 		}
 
+		selectedTower.Destroy();
+		numTurrets--;
+		towerText.text = numTurrets + " / " + maxTurrets;
+		ClickState = ClickStates.None;
+		SelectedTower = null;
 	}
-
 	public void ClearRocks() {
 		List<Transform> rocks = rockHolder.GetComponentsInChildren<Transform> ().ToList();
 		while (rocks.Count > 1) {
@@ -214,7 +174,7 @@ public class Grid : MonoBehaviour {
 		}
 	}
 
-	bool IsPathClear(Tile tile) {
+	public bool IsPathClear(Tile tile) {
 		tile.TestAsOccupied = true;
 		Vector3 startPos = tiles [0, 0].transform.position;
 		Vector3 gridPos = startPos - startPosition;
@@ -300,6 +260,7 @@ public class Grid : MonoBehaviour {
 		return false;
 	}
 	public void StartWave() {
+		startButton.SetActive (false);
 		spawnRoutine = StartCoroutine (gameObject.RunAfterRepeating(spawnDelegate, spawnTime));
 	}
 
@@ -340,6 +301,40 @@ public class Grid : MonoBehaviour {
 	public static Grid TheGrid {
 		get {
 			return instance;
+		}
+	}
+
+	public Tile SelectedTile {
+		get {
+			return selectedTile;
+		}
+
+		set {
+			if (selectedTile) {
+				selectedTile.Selected = false;
+			}
+
+			if (value) {
+				selectedTile = value;
+				selectedTile.Selected = true;
+			}
+		}
+	}
+
+	public Tower SelectedTower {
+		get {
+			return selectedTower;
+		}
+
+		set {
+			if (selectedTower != null) {
+				selectedTower.Highlighted = false;
+			}
+
+			if (value) {
+				selectedTower = value;
+				selectedTower.Highlighted = true;
+			}
 		}
 	}
 
@@ -491,12 +486,17 @@ public class Grid : MonoBehaviour {
 		ClickState = (ClickStates)System.Enum.Parse(typeof(ClickStates), cs);
 	}
 
-	ClickStates ClickState {
+	public ClickStates ClickState {
 		get {
 			return clickState;
 		}
 
-		set {
+		private set {
+			if (clickState == ClickStates.BuildTurret) {
+				SelectedTile = null;
+			} else if (clickState == ClickStates.DestroyTurret || clickState == ClickStates.UpgradeTurret) {
+				SelectedTower = null;
+			}
 			clickState = value;
 			HideButtons (clickState != ClickStates.None);
 		}
@@ -507,6 +507,7 @@ public class Grid : MonoBehaviour {
 		buildButton.SetActive(!hideBuildUpgradeDestory);
 		upgradeButton.SetActive(!hideBuildUpgradeDestory);
 		destroyButton.SetActive(!hideBuildUpgradeDestory);
+		startButton.SetActive(!hideBuildUpgradeDestory);
 
 	}
 
@@ -515,6 +516,7 @@ public class Grid : MonoBehaviour {
 		buildButton.SetActive(false);
 		upgradeButton.SetActive(false);
 		destroyButton.SetActive(false);
+		startButton.SetActive(false);
 	}
 }
 
