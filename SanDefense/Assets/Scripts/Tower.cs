@@ -197,7 +197,7 @@ public class Tower : MonoBehaviour
     {
         if (timer > attackCooldown)
         {
-            Bullet bul = (Instantiate(bullet, barrelTip.transform.position, head.transform.rotation, transform)).GetComponent<Bullet>();
+            Bullet bul = (Instantiate(bullet, barrelTip.transform.position, head.transform.rotation)).GetComponent<Bullet>();
             bul.Initialize(target, bulletSpeed, damage);
             timer = 0;
         }
