@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour {
     public int moneyAmount = 100;
     public int waveNumber;
 
-    public GameObject wave;
+    public Wave wave;
     [SerializeField]
 	int maxCastleHP;
 
@@ -72,7 +72,7 @@ public class GameManager : MonoBehaviour {
 
 
 			hpText.text = maxCastleHP + " / " + maxCastleHP;
-			yield return StartCoroutine(wave.GetComponent<Wave> ().RollTide (waveNumber+1));//randomWaveSize(waveNumber + 1);
+			yield return StartCoroutine(wave.RollTide (waveNumber+1));//randomWaveSize(waveNumber + 1);
 
 			StartSetup ();
 		} else if (paused) {
@@ -109,7 +109,7 @@ public class GameManager : MonoBehaviour {
 
 		Grid.TheGrid.EndWave ();
 
-		yield return StartCoroutine(wave.GetComponent<Wave> ().RollTide (waveNumber + 1));
+		yield return StartCoroutine(wave.RollTide (waveNumber + 1));
 
         currentCoroutine = StartCoroutine (gameObject.RunAfter(startSetupDelegate, 2));
 	}

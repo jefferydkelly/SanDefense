@@ -21,7 +21,6 @@ public class Wave : MonoBehaviour {
 		yield return StartCoroutine (MoveBackwards());
 
 		if (level > 1) {
-			Debug.Log ("Scatter");
 			Grid.TheGrid.ClearRocks ();
 			Grid.TheGrid.ScatterRocks ();
 		}
