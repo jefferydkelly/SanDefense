@@ -9,9 +9,11 @@ public class GameManager : MonoBehaviour {
 	bool paused = false;
 	int curCastleHP = 0;
     public int moneyAmount = 100;
+    public int waveNumber;
+
+    public GameObject wave;
     [SerializeField]
 	int maxCastleHP;
-	int waveNumber;
 
 	[SerializeField]
 	int maxWaves = 10;
@@ -102,6 +104,8 @@ public class GameManager : MonoBehaviour {
 		waveState = WaveState.EndWave;
 		msgBox.Text = "Wave Over";
 		Invoke ("HideMessage", 2.0f);
+        wave.GetComponent<wave>().randomWaveSize(waveNumber);
+
 		Grid.TheGrid.EndWave ();
 		currentCoroutine = StartCoroutine (gameObject.RunAfter(startSetupDelegate, 10));
 	}
@@ -113,8 +117,9 @@ public class GameManager : MonoBehaviour {
 		Invoke ("HideMessage", 2.0f);
 		waveState = WaveState.SetUp;
 		waveNumber++;
-		if (waveNumber < maxWaves) {
-			waveText.text = waveNumber + " / " + maxWaves;
+        wave.GetComponent<wave>().randomWaveSize(waveNumber);
+        if (waveNumber < maxWaves) {
+			waveText.text = "\t" + waveNumber + " / " + maxWaves;
 			waveDisplay.value = waveNumber;
 			currentCoroutine = StartCoroutine (gameObject.RunAfter (startWaveDelegate, 15));
 		} else {
