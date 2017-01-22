@@ -11,27 +11,40 @@ ModelImporter:
     100006: Turret_Body_Sand_2
     100008: Turret_Gun
     100010: Turret_Gun_Base
+    100012: Turret
+    100014: Turret_Base
     400000: //RootNode
     400002: Turret_Basic_Body
     400004: Turret_Body_Sand_1
     400006: Turret_Body_Sand_2
     400008: Turret_Gun
     400010: Turret_Gun_Base
+    400012: Turret
+    400014: Turret_Base
     2300000: Turret_Basic_Body
     2300002: Turret_Body_Sand_1
     2300004: Turret_Body_Sand_2
     2300006: Turret_Gun
     2300008: Turret_Gun_Base
+    2300010: //RootNode
+    2300012: Turret
+    2300014: Turret_Base
     3300000: Turret_Basic_Body
     3300002: Turret_Body_Sand_1
     3300004: Turret_Body_Sand_2
     3300006: Turret_Gun
     3300008: Turret_Gun_Base
+    3300010: //RootNode
+    3300012: Turret
+    3300014: Turret_Base
     4300000: Turret_Basic_Body
     4300002: Turret_Body_Sand_1
     4300004: Turret_Body_Sand_2
     4300006: Turret_Gun
     4300008: Turret_Gun_Base
+    4300010: Sand
+    4300012: Turret_Base
+    4300014: Turret
     9500000: //RootNode
   materials:
     importMaterials: 1
