@@ -52,6 +52,12 @@ public class Tower : MonoBehaviour
 
     ParticleSystem particleSys;
 
+    AudioSource audioSrc;
+    float lowPitch = .7f;
+    float highPitch = 1.2f;
+    float lowVol = .3f;
+    float highVol = .4f;
+
     public int Level
     {
         get { return level; }
@@ -60,6 +66,12 @@ public class Tower : MonoBehaviour
 	public int Cost {
 		get { return cost; }
 	}
+
+    void Awake()
+    {
+        audioSrc = GetComponent<AudioSource>();
+    }
+
     // Use this for initialization
     void Start()
     {
@@ -77,6 +89,7 @@ public class Tower : MonoBehaviour
 		textMesh = GetComponentInChildren<TextMesh> ();
 		textMesh.text = "Level 1\nCost To Upgrade: " + ((level + 1) * 25);
 		textMesh.gameObject.SetActive (false);
+
     }
 
     // Update is called once per frame
@@ -216,9 +229,19 @@ public class Tower : MonoBehaviour
         {
             Bullet bul = (Instantiate(bullet, barrelTip.transform.position, head.transform.rotation)).GetComponent<Bullet>();
             bul.Initialize(target, bulletSpeed, damage);
+            StartCoroutine(PlayAudio());
+
             timer = 0;
         }
     }
+
+    IEnumerator PlayAudio()
+    {
+        audioSrc.pitch = Random.Range(lowPitch, highPitch);
+        float vol = Random.Range(lowVol, highVol);
+        audioSrc.PlayOneShot(audioSrc.clip, vol);
+        yield return null;
+    }           
 
     public void Upgrade()
     {
