@@ -114,9 +114,9 @@ public class Grid : MonoBehaviour {
 	}
 
 	public void UpgradeTower() {
-		if (GameManager.Instance.Funds >= 25 * selectedTower.Level && selectedTower.Level < 3)
+		if (GameManager.Instance.Funds >= SelectedTower.Cost && selectedTower.Level < 3)
 		{
-			GameManager.Instance.Funds -= 25 * selectedTower.Level;
+			GameManager.Instance.Funds -= SelectedTower.Cost;
 			selectedTower.Upgrade();
 			ClickState = ClickStates.None;
 			SelectedTower = null;
@@ -126,12 +126,12 @@ public class Grid : MonoBehaviour {
 	public void DemolishTower() {
 		if (selectedTower.RoundConstructed == GameManager.Instance.CurWave) {
 			if (GameManager.Instance.WaveState == WaveState.SetUp) {
-				GameManager.Instance.Funds += 25;
+				GameManager.Instance.Funds += SelectedTower.TotalSpent;
 			} else {
-				GameManager.Instance.Funds += 12;
+				GameManager.Instance.Funds += Mathf.FloorToInt((float)(SelectedTower.TotalSpent) / 2.0f);
 			}
 		} else {
-			GameManager.Instance.Funds += 5;
+			GameManager.Instance.Funds += Mathf.FloorToInt((float)(SelectedTower.TotalSpent) / 5.0f);
 		}
 
 		selectedTower.Destroy();
