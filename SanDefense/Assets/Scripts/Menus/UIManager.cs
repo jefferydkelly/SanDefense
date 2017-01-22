@@ -12,8 +12,8 @@ public class UIManager : MonoBehaviour {
     public GameObject game;
     public GameObject difficulty;
     public GameObject mainMenu;
-    public GameObject options;
     public GameObject credits;
+    public GameObject goal;
     public GameObject pause;
 
     // Use this for initialization
@@ -47,8 +47,8 @@ public class UIManager : MonoBehaviour {
 			difficulty.SetActive(gameState == GameStates.Difficulty);
 
 			mainMenu.SetActive(gameState == GameStates.MainMenu);
-			options.SetActive(gameState == GameStates.Options);
 			credits.SetActive(gameState == GameStates.Credits);
+            goal.SetActive(gameState == GameStates.Goal);
             pause.SetActive(gameState == GameStates.Pause);
         }
 	}
@@ -71,7 +71,7 @@ public enum GameStates {
 	MainMenu,
 	Difficulty,
 	Game,
-	Options,
 	Credits,
+    Goal,
     Pause
 }
