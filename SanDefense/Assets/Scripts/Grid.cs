@@ -148,6 +148,7 @@ public class Grid : MonoBehaviour {
 								GameManager.Instance.funds (5);
 							}
 							Destroy (selectedTower.gameObject);
+							numTurrets--;
 							ClickState = ClickStates.None;
 							//Refund the cost of the object
 						} else {

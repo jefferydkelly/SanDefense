@@ -12,6 +12,7 @@ public class Movement : MonoBehaviour {
 	[SerializeField]
 	float atkTime = 1f;
 	int atkDamage = 1;
+	Tile tile;
 	// Use this for initialization
 	void Start () {
 		lastTilePos = transform.position;
@@ -39,7 +40,8 @@ public class Movement : MonoBehaviour {
 						path.Remove (dest);
 
 						if (path.IsEmpty ()) {
-							dest.Occupant = gameObject;
+							tile = dest;
+							tile.Occupant = gameObject;
 						}
 					} else {
 						path = Grid.TheGrid.CalcPathToCastle (lastTilePos);
@@ -84,5 +86,11 @@ public class Movement : MonoBehaviour {
 
 	void Attack() {
 		GameManager.Instance.DamageCastle (atkDamage);
+	}
+
+	void OnDestroy() {
+		if (tile != null) {
+			tile.Occupant = null;
+		}
 	}
 }
