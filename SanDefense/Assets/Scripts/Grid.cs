@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 public class Grid : MonoBehaviour {
 	public Vector3 startPosition = new Vector3(-5, 0, -5);
 	/// <summary>
@@ -13,6 +14,7 @@ public class Grid : MonoBehaviour {
 	List<GameObject> enemiePrefabs;
 	public GameObject towerPrefab;
 	public GameObject wallPrefab;
+	public GameObject rockPrefab;
 
 	[SerializeField]
 	float spawnTime = 1.0f;
@@ -41,6 +43,7 @@ public class Grid : MonoBehaviour {
 
 	GameObject towerHolder;
 	GameObject enemyHolder;
+	GameObject rockHolder;
 	// Use this for initialization
 	ClickStates clickState = ClickStates.None;
 	WaitDelegate spawnDelegate;
@@ -51,6 +54,7 @@ public class Grid : MonoBehaviour {
 		GameObject gridHolder = new GameObject ("Grid");
 		towerHolder = new GameObject ("Towers");
 		enemyHolder = new GameObject ("Enemies");
+		rockHolder = new GameObject ("Rocks");
 		tiles = new Tile[(int)gridSize.x, (int)gridSize.y];
 		allTiles = new GameObject[(int)gridSize.x, (int)gridSize.y + 1];
 		for (int i = 0; i < gridSize.y; i++) {
@@ -170,6 +174,41 @@ public class Grid : MonoBehaviour {
 			}
 		}
 
+	}
+
+	public void ClearRocks() {
+		List<Transform> rocks = rockHolder.GetComponentsInChildren<Transform> ().ToList();
+		while (rocks.Count > 1) {
+			GameObject go = rocks [1].gameObject;
+			rocks.Remove (go.transform);
+			Destroy (go);
+		}
+	}
+	public void ScatterRocks() {
+		int numRocks = Random.Range (1, 5);
+		for (int i = 0; i < numRocks; i++) {
+			int numTries = 0;
+			Tile t;
+			bool pathClear;
+			do {
+				int x = Random.Range (1, (int)gridSize.x - 1);
+				int y = Random.Range (1, (int)gridSize.y - 1);
+				t = tiles [x, y];
+				numTries++;
+				pathClear = IsPathClear (t);
+			} while (!pathClear && numTries < 5);
+
+			if (pathClear) {
+				if (t.Occupied) {
+					Destroy (t.Occupant);
+				}
+				GameObject rock = Instantiate (rockPrefab);
+				t.Occupant = rock;
+				rock.transform.position = t.transform.position;
+				rock.transform.parent = rockHolder.transform;
+
+			}
+		}
 	}
 
 	bool IsPathClear(Tile tile) {
