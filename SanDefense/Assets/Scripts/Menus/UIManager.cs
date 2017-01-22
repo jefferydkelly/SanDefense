@@ -48,7 +48,7 @@ public class UIManager : MonoBehaviour {
 
 			mainMenu.SetActive(gameState == GameStates.MainMenu);
 			credits.SetActive(gameState == GameStates.Credits);
-            goal.SetActive(gameState == GameStates.Goal);
+            //goal.SetActive(gameState == GameStates.Goal);
             pause.SetActive(gameState == GameStates.Pause);
         }
 	}
