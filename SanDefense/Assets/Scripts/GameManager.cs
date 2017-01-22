@@ -60,6 +60,7 @@ public class GameManager : MonoBehaviour {
 
 	public IEnumerator StartGame() {
 		if (!gameRunning) {
+			Grid.TheGrid.HideAllButtons ();
 			gameRunning = true;
 			paused = false;
 			curCastleHP = maxCastleHP;
