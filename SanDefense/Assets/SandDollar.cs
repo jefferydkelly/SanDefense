@@ -7,14 +7,12 @@ public class SandDollar : MonoBehaviour
 
     public int value = 5;
 
-    void OnMouseOver()
+    void OnMouseDown()
     {
-        if (Input.GetMouseButton(0))
-        {
-            GetComponentInChildren<Animator>().SetBool("Collected", true);
-            Destroy(gameObject, .75f);
-            GameManager.Instance.funds(value);
-            Destroy(GetComponent<SphereCollider>());
-        }
+        GetComponentInChildren<Animator>().SetBool("Collected", true);
+        Destroy(gameObject, .75f);
+		GameManager.Instance.Funds += value;
+        Destroy(GetComponent<SphereCollider>());
+        
     }
 }

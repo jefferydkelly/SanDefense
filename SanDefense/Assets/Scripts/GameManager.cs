@@ -8,7 +8,8 @@ public class GameManager : MonoBehaviour {
 	private static GameManager instance = null;
 	bool paused = false;
 	int curCastleHP = 0;
-    public int moneyAmount = 100;
+    
+	int moneyAmount = 100;
     public int waveNumber;
 
     public Wave wave;
@@ -92,13 +93,15 @@ public class GameManager : MonoBehaviour {
 			}
 		}
 	}
-	void StartWave() {
-
-		waveState = WaveState.Wave;
-		msgBox.Text = "Wave " + waveNumber + " Start";
-		Invoke ("HideMessage", 2.0f);
-		Grid.TheGrid.StartWave ();
-		currentCoroutine = StartCoroutine (gameObject.RunAfter(endWaveDelegate, 30 * (waveNumber + 1)));
+	public void StartWave() {
+		if (waveState == WaveState.SetUp) {
+			StopCoroutine (currentCoroutine);
+			waveState = WaveState.Wave;
+			msgBox.Text = "Wave " + waveNumber + " Start";
+			Invoke ("HideMessage", 2.0f);
+			Grid.TheGrid.StartWave ();
+			currentCoroutine = StartCoroutine (gameObject.RunAfter (endWaveDelegate, 30 * (waveNumber + 1)));
+		}
 	}
 
 	IEnumerator EndWave() {
@@ -174,11 +177,17 @@ public class GameManager : MonoBehaviour {
 			return won;
 		}
 	}
-    public void funds(int price)
-    {
-        moneyAmount += price;
-		moneyText.text = "\t" + moneyAmount.ToString();
-    }
+
+	public int Funds {
+		get {
+			return moneyAmount;
+		}
+
+		set {
+			moneyAmount = value;
+			moneyText.text = "\t" + moneyAmount.ToString();
+		}
+	}
 
 	public int CurWave {
 		get {

@@ -236,13 +236,29 @@ public class Tower : MonoBehaviour
 
     void OnMouseEnter()
     {
-        DisplayRange();
+		if ((Grid.TheGrid.ClickState == ClickStates.DestroyTurret || Grid.TheGrid.ClickState == ClickStates.UpgradeTurret)) {
+			Grid.TheGrid.SelectedTower = this;
+		} else {
+			DisplayRange ();
+		}
     }
 
     void OnMouseExit()
     {
-        StopDisplayRange();
+		if ((Grid.TheGrid.ClickState == ClickStates.DestroyTurret || Grid.TheGrid.ClickState == ClickStates.UpgradeTurret)) {
+			Grid.TheGrid.SelectedTower = null;
+		} else {
+			StopDisplayRange ();
+		}
     }
+
+	void OnMouseUp() {
+		if (Grid.TheGrid.ClickState == ClickStates.DestroyTurret) {
+			Grid.TheGrid.DemolishTower ();
+		} else if (Grid.TheGrid.ClickState == ClickStates.UpgradeTurret) {
+			Grid.TheGrid.UpgradeTower ();
+		}
+	}
 
     public void DisplayRange()
     {

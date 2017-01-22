@@ -18,13 +18,6 @@ public class CameraController : MonoBehaviour {
 
 		dir.Normalize ();
 		dir *= speed;
-		bool q = Input.GetKey (KeyCode.Q);
-		bool e = Input.GetKey (KeyCode.E);
-		if (q && !e) {
-			Camera.main.transform.RotateAround (Vector3.up, Time.deltaTime);
-		} else if (e) {
-			Camera.main.transform.RotateAround (Vector3.up, -Time.deltaTime);
-		}
 		Vector3 newPos = transform.position + dir * Time.deltaTime;
 		newPos.x = Mathf.Clamp (newPos.x, min.x, max.x);
 		newPos.y =  Mathf.Clamp (newPos.y, min.y, max.y);
