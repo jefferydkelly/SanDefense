@@ -149,7 +149,7 @@ public class Grid : MonoBehaviour {
 		}
 	}
 	public void ScatterRocks(int waterLevel) {
-		if (waterLevel >= 5) {
+		if (waterLevel >= 3) {
 			int numRocks = Random.Range (1, 5);
 			for (int i = 0; i < numRocks; i++) {
 				int numTries = 0;
@@ -157,7 +157,7 @@ public class Grid : MonoBehaviour {
 				bool pathClear;
 				do {
 					int x = Random.Range (1, (int)gridSize.x - 1);
-					int y = Random.Range (1, waterLevel - 4);
+					int y = Random.Range (1, waterLevel - 2);
 					t = tiles [x, y];
 					numTries++;
 					pathClear = IsPathClear (t);
@@ -511,7 +511,7 @@ public class Grid : MonoBehaviour {
 		buildButton.SetActive(!hideBuildUpgradeDestory);
 		upgradeButton.SetActive(!hideBuildUpgradeDestory);
 		destroyButton.SetActive(!hideBuildUpgradeDestory);
-		startButton.SetActive(!hideBuildUpgradeDestory);
+		startButton.SetActive(!hideBuildUpgradeDestory && GameManager.Instance.WaveState != WaveState.Wave);
 
 	}
 
