@@ -14,7 +14,7 @@ public class SandDollar : MonoBehaviour
             GetComponentInChildren<Animator>().SetBool("Collected", true);
             Destroy(gameObject, .75f);
             GameManager.Instance.funds(value);
-            Destroy(GetComponent<BoxCollider>());
+            Destroy(GetComponent<SphereCollider>());
         }
     }
 }

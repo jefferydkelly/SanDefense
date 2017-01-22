@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 [RequireComponent(typeof(BoxCollider))]
 public class Tower : MonoBehaviour
@@ -11,18 +12,12 @@ public class Tower : MonoBehaviour
         AttackLowest,
     };
 
-    public enum ShootStyle
-    {
-        Straight,
-        Lob,
-    };
 
     public GameObject bullet; //prefab of bullet to
     public GameObject turretHead; //this turns and shoot, if none use the game object this is attached to to turn
     public GameObject barrelTip;
     public AttackStyle attackStyle = AttackStyle.AttackLowest; //algorithm to determine the target
-    public ShootStyle shootStyle = ShootStyle.Straight;
-	int roundConstructed = -1;
+    int roundConstructed = -1;
 
     [Range(0, 500)]
     public float damage = 20;
@@ -39,14 +34,23 @@ public class Tower : MonoBehaviour
 
     private BoxCollider boxCollider;
     private Transform head;
- 
+
     private GameObject target;
     private float timer = 0;
     private Vector3 targetForward;
 
-	Renderer[] renderers;
-	Color highlightColor = Color.red;
-	Color regularColor;
+    private int level = 1;
+
+    Renderer[] renderers;
+    Color highlightColor = Color.red;
+    Color regularColor;
+
+    ParticleSystem particleSys;
+
+    public int Level
+    {
+        get { return level; }
+    }
     // Use this for initialization
     void Start()
     {
@@ -57,28 +61,31 @@ public class Tower : MonoBehaviour
         else head = transform;
 
         radiusSqr = Mathf.Pow(radius, 2);
-		renderers = GetComponentsInChildren<Renderer> ();
-		regularColor = renderers [0].material.color;
-		roundConstructed = GameManager.Instance.CurWave;
+        renderers = GetComponentsInChildren<Renderer>();
+        regularColor = renderers[0].material.color;
+        roundConstructed = GameManager.Instance.CurWave;
+        particleSys = GetComponentInChildren<ParticleSystem>();
     }
 
     // Update is called once per frame
     void Update()
     {
-		if (!GameManager.Instance.IsPaused) {
-			DetermineTarget ();
+        if (!GameManager.Instance.IsPaused)
+        {
+            DetermineTarget();
 
-			targetForward = head.forward;
+            targetForward = head.forward;
 
-			if (target) {
-				DetermineDirection ();
-				head.forward = Vector3.Lerp (head.forward, -targetForward, .6f);
-				Shoot ();
-			}
+            if (target)
+            {
+                DetermineDirection();
+                head.forward = Vector3.Lerp(head.forward, -targetForward, .6f);
+                Shoot();
+            }
 
 
-			timer += Time.deltaTime;
-		}
+            timer += Time.deltaTime;
+        }
     }
 
     void DetermineTarget()
@@ -92,13 +99,13 @@ public class Tower : MonoBehaviour
                 float lowestHealth = float.MaxValue;
 
                 //searches for target with lowest health
-				foreach (GameObject enemy in EnemyManager.Instance.Enemies)
+                foreach (GameObject enemy in EnemyManager.Instance.Enemies)
                 {
                     if (enemy)
                     {
                         Vector3 dist = enemy.transform.position - transform.position;
                         dist.y = 0;
-						float enemyHealth = enemy.GetComponent<Health> ().CurHealth;
+                        float enemyHealth = enemy.GetComponent<Health>().CurHealth;
                         if (dist.sqrMagnitude < radiusSqr && enemyHealth < lowestHealth)
                         {
                             target = enemy;
@@ -115,7 +122,7 @@ public class Tower : MonoBehaviour
                 float furthestDist = 0;
 
                 //loops through all enemies
-				foreach (GameObject enemy in EnemyManager.Instance.Enemies)
+                foreach (GameObject enemy in EnemyManager.Instance.Enemies)
                 {
                     //check if enemy is dead
                     if (enemy)
@@ -152,7 +159,7 @@ public class Tower : MonoBehaviour
                 }
 
                 //search for a new target
-				foreach (GameObject enemy in EnemyManager.Instance.Enemies)
+                foreach (GameObject enemy in EnemyManager.Instance.Enemies)
                 {
                     //check if enemy is dead
                     if (enemy)
@@ -180,10 +187,6 @@ public class Tower : MonoBehaviour
     void DetermineDirection()
     {
         targetForward = (target.transform.position - transform.position).normalized;
-        if (shootStyle == ShootStyle.Lob)
-        {
-            targetForward = (targetForward + Vector3.up).normalized;
-        }
     }
 
     /// <summary>
@@ -199,6 +202,37 @@ public class Tower : MonoBehaviour
         }
     }
 
+    public void Upgrade()
+    {
+        if (level < 3)
+        {
+
+            level++;
+            damage += 10 * level;
+            attackCooldown -= 0.02f * level;
+            radius += 0.5f * level;
+            radiusSqr = Mathf.Pow(radius, 2);
+            bulletSpeed += 0.75f * level;
+            particleSys.Play();
+        }
+    }
+
+    public void Destroy()
+    {
+        particleSys.Play();
+        Destroy(gameObject, particleSys.main.duration + particleSys.main.startLifetime.constant);
+        StartCoroutine(DestroyTower());
+    }
+
+    IEnumerator DestroyTower()
+    {
+        yield return new WaitForSeconds(particleSys.main.duration);
+        for(int i = 1; i < renderers.Length; i ++)
+        {
+            renderers[i].enabled = false;
+        }
+    }
+
     //for visualizing radius
     void OnDrawGizmos()
     {
@@ -206,18 +240,23 @@ public class Tower : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, radius);
     }
 
-	public bool Highlighted {
-		set {
-			Color c = value ? highlightColor : regularColor;
-			foreach (Renderer r in renderers) {
-				r.material.color = c;
-			}
-		}
-	}
+    public bool Highlighted
+    {
+        set
+        {
+            Color c = value ? highlightColor : regularColor;
+            foreach (Renderer r in renderers)
+            {
+                r.material.color = c;
+            }
+        }
+    }
 
-	public int RoundConstructed {
-		get {
-			return roundConstructed;
-		}
-	}
+    public int RoundConstructed
+    {
+        get
+        {
+            return roundConstructed;
+        }
+    }
 }
