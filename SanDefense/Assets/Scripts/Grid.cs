@@ -87,15 +87,12 @@ public class Grid : MonoBehaviour {
 	void Update () {
 
 		if (clickState != ClickStates.None) {
-			Vector3 mousePosition = Input.mousePosition;
-			mousePosition.z = Camera.main.transform.position.y;
-			mousePosition = Camera.main.ScreenToWorldPoint (mousePosition);
-			mousePosition.y = Camera.main.transform.position.y;
-
+			Ray mouseRay = Camera.main.ScreenPointToRay (Input.mousePosition);
 			RaycastHit hit;
 
 			if (clickState == ClickStates.BuildTurret || clickState == ClickStates.BuildWall) {
-				if (Physics.Raycast (mousePosition, Vector3.down, out hit, Camera.main.transform.position.y, 1 << LayerMask.NameToLayer ("Tiles"))) {
+				//if (Physics.Raycast (mousePosition, Camera.main.transform.forward, out hit, 30, 1 << LayerMask.NameToLayer ("Tiles"))) {
+				if (Physics.Raycast(mouseRay, out hit, 20, 1 << LayerMask.NameToLayer ("Tiles"))) {
 					if (hit.collider.gameObject != selectedTile) {
 						if (selectedTile != null) {
 							selectedTile.Selected = false;
@@ -129,7 +126,7 @@ public class Grid : MonoBehaviour {
 					selectedTile.Selected = false;
 				}
 			} else {
-				if (Physics.Raycast (mousePosition, Vector3.down, out hit, Camera.main.transform.position.y, 1 << LayerMask.NameToLayer ("Structures"))) {
+				if (Physics.Raycast (mouseRay, out hit, 20, 1 << LayerMask.NameToLayer ("Structures"))) {
 					if (hit.collider.gameObject != selectedTower) {
 						if (selectedTower != null) {
 							selectedTower.Highlighted = false;
