@@ -165,6 +165,9 @@ public class Grid : MonoBehaviour {
                     {
                         GameManager.Instance.funds(-25 * selectedTower.Level);
                         selectedTower.Upgrade();
+						ClickState = ClickStates.None;
+						selectedTower.Highlighted = false;
+						selectedTower = null;
                     }
                 }
 
