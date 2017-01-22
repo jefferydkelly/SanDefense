@@ -47,7 +47,7 @@ public class GameManager : MonoBehaviour {
 				StartWave ();
 			};
 			endWaveDelegate = () => {
-				EndWave ();
+				StartCoroutine(EndWave ());
 			};
 			startSetupDelegate = () => {
 				StartSetup();
@@ -71,7 +71,7 @@ public class GameManager : MonoBehaviour {
 
 
 			hpText.text = maxCastleHP + " / " + maxCastleHP;
-			yield return StartCoroutine(wave.GetComponent<Wave> ().RollTide (1));//randomWaveSize(waveNumber + 1);
+			yield return StartCoroutine(wave.GetComponent<Wave> ().RollTide (waveNumber+1));//randomWaveSize(waveNumber + 1);
 
 			StartSetup ();
 		} else if (paused) {
@@ -100,16 +100,16 @@ public class GameManager : MonoBehaviour {
 		currentCoroutine = StartCoroutine (gameObject.RunAfter(endWaveDelegate, 30 * (waveNumber + 1)));
 	}
 
-	void EndWave() {
+	IEnumerator EndWave() {
 		waveState = WaveState.EndWave;
 		msgBox.Text = "Wave Over";
 		Invoke ("HideMessage", 2.0f);
 
 		Grid.TheGrid.EndWave ();
 
-        //wave.GetComponent<Wave>().randomWaveSize(waveNumber + 1);
+		yield return StartCoroutine(wave.GetComponent<Wave> ().RollTide (waveNumber + 1));
 
-        currentCoroutine = StartCoroutine (gameObject.RunAfter(startSetupDelegate, 10));
+        currentCoroutine = StartCoroutine (gameObject.RunAfter(startSetupDelegate, 2));
 	}
 
 	void StartSetup() {
@@ -119,6 +119,7 @@ public class GameManager : MonoBehaviour {
 		Invoke ("HideMessage", 2.0f);
 		waveState = WaveState.SetUp;
 		waveNumber++;
+
         if (waveNumber < maxWaves) {
 			waveText.text = "\t" + waveNumber + " / " + maxWaves;
 			waveDisplay.value = waveNumber;
