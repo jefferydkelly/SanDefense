@@ -18,7 +18,9 @@ public class Tower : MonoBehaviour
     public GameObject barrelTip;
     public AttackStyle attackStyle = AttackStyle.AttackLowest; //algorithm to determine the target
     public GameObject rangeDisplay;
+	TextMesh textMesh;
     int roundConstructed = -1;
+
 
     [Range(0, 500)]
     public float damage = 20;
@@ -40,7 +42,9 @@ public class Tower : MonoBehaviour
     private float timer = 0;
     private Vector3 targetForward;
 
+	int maxLevel = 3;
     private int level = 1;
+	int cost = 25;
 
     Renderer[] renderers;
     Color highlightColor = Color.red;
@@ -52,6 +56,10 @@ public class Tower : MonoBehaviour
     {
         get { return level; }
     }
+
+	public int Cost {
+		get { return cost; }
+	}
     // Use this for initialization
     void Start()
     {
@@ -66,6 +74,9 @@ public class Tower : MonoBehaviour
         regularColor = renderers[0].material.color;
         roundConstructed = GameManager.Instance.CurWave;
         particleSys = GetComponentInChildren<ParticleSystem>();
+		textMesh = GetComponentInChildren<TextMesh> ();
+		textMesh.text = "Level 1\nCost To Upgrade: " + ((level + 1) * 25);
+		textMesh.gameObject.SetActive (false);
     }
 
     // Update is called once per frame
@@ -211,7 +222,7 @@ public class Tower : MonoBehaviour
 
     public void Upgrade()
     {
-        if (level < 3)
+		if (level < maxLevel)
         {
 
             level++;
@@ -221,6 +232,12 @@ public class Tower : MonoBehaviour
             radiusSqr = Mathf.Pow(radius, 2);
             bulletSpeed += 0.75f * level;
             particleSys.Play();
+			cost += 25 * level;
+			textMesh.text = "Level " + level;
+
+			if (level < maxLevel) {
+				textMesh.text += "\nCost To Upgrade: " + ((level + 1) * 25);
+			}
         }
     }
 
@@ -244,6 +261,7 @@ public class Tower : MonoBehaviour
     {
 		if ((Grid.TheGrid.ClickState == ClickStates.DestroyTurret || Grid.TheGrid.ClickState == ClickStates.UpgradeTurret)) {
 			Grid.TheGrid.SelectedTower = this;
+			textMesh.gameObject.SetActive (Grid.TheGrid.ClickState == ClickStates.UpgradeTurret);
 		} else {
 			DisplayRange ();
 		}
@@ -252,6 +270,7 @@ public class Tower : MonoBehaviour
     void OnMouseExit()
     {
 		if ((Grid.TheGrid.ClickState == ClickStates.DestroyTurret || Grid.TheGrid.ClickState == ClickStates.UpgradeTurret)) {
+			textMesh.gameObject.SetActive (false);
 			Grid.TheGrid.SelectedTower = null;
 		} else {
 			StopDisplayRange ();
@@ -263,6 +282,7 @@ public class Tower : MonoBehaviour
 			Grid.TheGrid.DemolishTower ();
 		} else if (Grid.TheGrid.ClickState == ClickStates.UpgradeTurret) {
 			Grid.TheGrid.UpgradeTower ();
+			textMesh.gameObject.SetActive (false);
 		}
 	}
 
