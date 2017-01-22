@@ -17,6 +17,7 @@ public class Tower : MonoBehaviour
     public GameObject turretHead; //this turns and shoot, if none use the game object this is attached to to turn
     public GameObject barrelTip;
     public AttackStyle attackStyle = AttackStyle.AttackLowest; //algorithm to determine the target
+    public GameObject rangeDisplay;
     int roundConstructed = -1;
 
     [Range(0, 500)]
@@ -231,6 +232,38 @@ public class Tower : MonoBehaviour
         {
             renderers[i].enabled = false;
         }
+    }
+
+    void OnMouseEnter()
+    {
+        DisplayRange();
+    }
+
+    void OnMouseExit()
+    {
+        StopDisplayRange();
+    }
+
+    public void DisplayRange()
+    {
+        switch (level)
+        {
+            case 1:
+                rangeDisplay.transform.localScale = Vector3.one * 0.9776393f;
+                break;
+            case 2:
+                rangeDisplay.transform.localScale = Vector3.one * 1.193585f;
+                break;
+            case 3:
+                rangeDisplay.transform.localScale = Vector3.one * 1.504687f;
+                break;
+        }
+        rangeDisplay.SetActive(true);
+    }
+
+    public void StopDisplayRange()
+    {
+        rangeDisplay.SetActive(false);
     }
 
     //for visualizing radius
