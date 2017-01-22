@@ -17,6 +17,8 @@ public class Grid : MonoBehaviour {
 	public GameObject rockPrefab;
 
 	[SerializeField]
+	Text towerText;
+	[SerializeField]
 	float spawnTime = 1.0f;
 	[SerializeField]
 	int maxEnemies;
@@ -85,6 +87,7 @@ public class Grid : MonoBehaviour {
 		directions.Add (new Vector3 (0, 0, -1));
 		//cancelButton.SetActive (false);
 		ClickState = ClickStates.None;
+		towerText.text = "0 / " + maxTurrets;
 	}
 
 	// Update is called once per frame
@@ -119,7 +122,7 @@ public class Grid : MonoBehaviour {
 									selectedTile.Occupant.transform.parent = towerHolder.transform;
 
 									numTurrets++;
-
+									towerText.text = numTurrets + " / " + maxTurrets;
 									GameManager.Instance.funds (-25);
 								}
 								selectedTile.Selected = false;
@@ -158,6 +161,7 @@ public class Grid : MonoBehaviour {
 
                         selectedTower.Destroy();
                         numTurrets--;
+						towerText.text = numTurrets + " / " + maxTurrets;
                         ClickState = ClickStates.None;
                         //Refund the cost of the object
                     }
