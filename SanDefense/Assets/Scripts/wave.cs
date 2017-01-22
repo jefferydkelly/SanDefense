@@ -2,62 +2,37 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class wave : MonoBehaviour {
+public class Wave : MonoBehaviour {
 
-    public float speed = 1;
-    public GameObject point0;
+	public float speed = 1;
+	public Vector3 point0;
 
-    Vector3 waveSize;
+	Vector3 waveSize;
 
-    wavePositions wavePosition;
-
-    public enum wavePositions
-    {
-        idle,
-        forward,
-        backward
-    }
-
-    // Use this for initialization
-    void Start () {
-
-        wavePosition = wavePositions.idle;
-	}
-	
-	// Update is called once per frame
-	void Update () {
-
-        if (wavePosition == wavePositions.forward)
-        {
-            float distance = transform.position.x / waveSize.x;
-
-            transform.position = Vector3.MoveTowards(transform.position, waveSize, (distance * 1.5f) * Time.deltaTime);
-
-        } else if (wavePosition == wavePositions.backward)
-        {
-            float distance = transform.position.x / waveSize.x;
-
-            transform.position = Vector3.MoveTowards(transform.position, point0.transform.position, (distance * 1.5f) * Time.deltaTime);
-
-        }
-
-        checkPosition();
+	// Use this for initialization
+	void Start () {
+		point0 = transform.position;
 	}
 
-    void checkPosition()
-    {
-        if (transform.position == waveSize)
-        {
-            wavePosition = wavePositions.backward;
-        } if (transform.position == point0.transform.position)
-        {
-            wavePosition = wavePositions.idle;
-        }
-    }
+	public IEnumerator RollTide(int level) {
+		float zDif = Random.Range (1, level + 3) * 2;
+		waveSize = transform.position + new Vector3(0, 0, zDif);
+		yield return StartCoroutine (MoveForward());
+		yield return StartCoroutine (MoveBackwards());
+	}
 
-    public void randomWaveSize(int level)
-    {
-        waveSize = transform.position + new Vector3(0, 0, Random.Range(0, level + 3) * 2);
-        wavePosition = wavePositions.forward;
-    }
+	IEnumerator MoveForward() {
+		while (transform.position.z < waveSize.z) {
+			transform.position += new Vector3 (0, 0, Time.deltaTime);
+			yield return null;
+		}
+	}
+
+	IEnumerator MoveBackwards() {
+		while (transform.position.z > point0.z) {
+			transform.position -= new Vector3 (0, 0, Time.deltaTime);
+			yield return null;
+		}
+	}
 }
+
