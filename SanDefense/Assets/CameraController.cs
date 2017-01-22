@@ -21,9 +21,9 @@ public class CameraController : MonoBehaviour {
 		bool q = Input.GetKey (KeyCode.Q);
 		bool e = Input.GetKey (KeyCode.E);
 		if (q && !e) {
-			dir.y = 7.5f;
+			Camera.main.transform.RotateAround (Vector3.up, Time.deltaTime);
 		} else if (e) {
-			dir.y = -5;
+			Camera.main.transform.RotateAround (Vector3.up, -Time.deltaTime);
 		}
 		Vector3 newPos = transform.position + dir * Time.deltaTime;
 		newPos.x = Mathf.Clamp (newPos.x, min.x, max.x);
