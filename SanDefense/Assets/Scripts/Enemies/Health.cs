@@ -17,6 +17,8 @@ public class Health : MonoBehaviour {
     public GameObject[] Drops;
     private ParticleSystem particleSystem;
 
+    public GameObject[] limbs;
+
     public float CurHealth
     {
         get { return currentHealth; }
@@ -62,7 +64,16 @@ public class Health : MonoBehaviour {
 		{
             Instantiate(Drops[Random.Range(0,Drops.Length)], transform.position + Vector3.up * 1, Quaternion.identity);
 			EnemyManager.Instance.Enemies.Remove (gameObject);
+            //Destroy(GetComponent<Movement>());
+            //Destroy(GetComponentInChildren<Animator>());
+            //foreach(GameObject limb in limbs)
+            //{
+            //    limb.AddComponent<BoxCollider>();
+            //    limb.AddComponent<Rigidbody>();
+            //    limb.GetComponent<Rigidbody>().AddExplosionForce(5, transform.position, 2);
+            //}
 			Destroy(gameObject);
+            //Destroy(this);
 		}
     }
 
