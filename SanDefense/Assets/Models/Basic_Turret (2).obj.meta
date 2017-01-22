@@ -1,28 +1,22 @@
 fileFormatVersion: 2
-guid: 2f709bd07d44dc34fa8afcbd939962eb
-timeCreated: 1485044319
+guid: ecfe8bf4cb32783428f9538fdb6d310f
+timeCreated: 1485057022
 licenseType: Pro
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
     100000: //RootNode
-    100002: Turret_Long_Base
-    100004: Turret_Long_Flag
-    100006: Turret_Long_Sand
+    100002: Turret_Basic
+    100004: Turret_Gun_Base
     400000: //RootNode
-    400002: Turret_Long_Base
-    400004: Turret_Long_Flag
-    400006: Turret_Long_Sand
-    2300000: Turret_Long_Base
-    2300002: Turret_Long_Flag
-    2300004: Turret_Long_Sand
-    3300000: Turret_Long_Base
-    3300002: Turret_Long_Flag
-    3300004: Turret_Long_Sand
-    4300000: Turret_Long_Base
-    4300002: Turret_Long_Sand
-    4300004: Turret_Long_Flag
-    9500000: //RootNode
+    400002: Turret_Basic
+    400004: Turret_Gun_Base
+    2300000: Turret_Basic
+    2300002: Turret_Gun_Base
+    3300000: Turret_Basic
+    3300002: Turret_Gun_Base
+    4300000: Turret_Basic
+    4300002: Turret_Gun_Base
   materials:
     importMaterials: 1
     materialName: 0
@@ -85,7 +79,7 @@ ModelImporter:
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 2
+  animationType: 0
   humanoidOversampling: 1
   additionalBone: 0
   userData: 

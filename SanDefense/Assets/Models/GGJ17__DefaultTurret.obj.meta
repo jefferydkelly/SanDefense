@@ -1,16 +1,17 @@
 fileFormatVersion: 2
-guid: 3bfb89335b8308f47a05c4ba234761cc
-timeCreated: 1485035305
+guid: 636914cfa1d3c0c409b0f3b1f5d0208b
+timeCreated: 1485050313
 licenseType: Pro
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
-    100000: //RootNode
-    400000: //RootNode
-    2300000: //RootNode
-    3300000: //RootNode
-    4300000: Castle
-    9500000: //RootNode
+    100000: Default_Tower_Combined
+    100002: //RootNode
+    400000: Default_Tower_Combined
+    400002: //RootNode
+    2300000: Default_Tower_Combined
+    3300000: Default_Tower_Combined
+    4300000: Default_Tower_Combined
   materials:
     importMaterials: 1
     materialName: 0
@@ -73,7 +74,7 @@ ModelImporter:
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 2
+  animationType: 0
   humanoidOversampling: 1
   additionalBone: 0
   userData: 
