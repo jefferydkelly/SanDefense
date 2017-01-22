@@ -20,6 +20,7 @@ public class Wave : MonoBehaviour {
 		waveSize = transform.position + new Vector3(0, 0, zDif);
 		yield return StartCoroutine (MoveForward());
 		if (level > 1) {
+			Debug.Log ("level");
 			Grid.TheGrid.ClearRocks ();
 			Grid.TheGrid.ScatterRocks (zDif);
 		}
