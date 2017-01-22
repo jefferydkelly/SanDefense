@@ -73,7 +73,6 @@ public class GameManager : MonoBehaviour {
 
             hpText.text = "HP " + maxCastleHP + " / " + maxCastleHP;
 			yield return StartCoroutine(wave.RollTide (waveNumber+1));//randomWaveSize(waveNumber + 1);
-            Debug.Log("Done");
             StartSetup ();
 		} else if (paused) {
 			paused = false;
