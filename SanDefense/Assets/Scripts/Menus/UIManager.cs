@@ -39,9 +39,10 @@ public class UIManager : MonoBehaviour {
 
 		set {
 			gameState = value;
-
+            
 			game.SetActive(gameState == GameStates.Game);
 			if (gameState == GameStates.Game) {
+                Debug.Log(GameManager.Instance == null);
 				StartCoroutine(GameManager.Instance.StartGame ());
 			}
 			difficulty.SetActive(gameState == GameStates.Difficulty);
