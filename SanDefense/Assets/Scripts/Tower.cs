@@ -73,9 +73,15 @@ public class Tower : MonoBehaviour
     {
         if (!GameManager.Instance.IsPaused)
         {
-            DetermineTarget();
+            
 
-            targetForward = head.forward;
+            
+
+			if (!target || Vector3.Distance(target.transform.position, transform.position) > radius) {
+				DetermineTarget();
+			}
+
+			targetForward = head.forward;
 
             if (target)
             {
