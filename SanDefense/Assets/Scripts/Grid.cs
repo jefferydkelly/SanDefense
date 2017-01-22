@@ -272,7 +272,7 @@ public class Grid : MonoBehaviour {
 			Destroy (go);
 		}
 		StopCoroutine (spawnRoutine);
-		spawnTime *= 0.9f;
+		spawnTime -= 0.05f;
 	}
 
 	/// <summary>

@@ -116,12 +116,13 @@ public class GameManager : MonoBehaviour {
 	}
 
 	void StartSetup() {
+		waveState = WaveState.SetUp;
 		Grid.TheGrid.SetClickState ("None");
 		msgBox.Text = "Setup";
 
 		castleHealthDisplay.value = maxCastleHP;
 		Invoke ("HideMessage", 2.0f);
-		waveState = WaveState.SetUp;
+
 		waveNumber++;
 
         if (waveNumber < maxWaves) {
