@@ -98,7 +98,7 @@ public class Grid : MonoBehaviour {
 				GameObject turret = clickState == ClickStates.BuildTurret ? Instantiate (towerPrefab) : Instantiate (wallPrefab);
 				selectedTile.Occupant = turret;
 				Vector3 ex = turret.GetComponent<Collider> ().bounds.extents;
-				turret.transform.position = selectedTile.transform.position + new Vector3 (0, ex.y, -ex.z / 2);
+				turret.transform.position = selectedTile.transform.position + new Vector3 (-ex.x, ex.y, 0);
 				selectedTile.Occupant.transform.parent = towerHolder.transform;
 
 				numTurrets++;
