@@ -509,6 +509,13 @@ public class Grid : MonoBehaviour {
 		destroyButton.SetActive(!hideBuildUpgradeDestory);
 
 	}
+
+	public void HideAllButtons() {
+		cancelButton.SetActive(false);
+		buildButton.SetActive(false);
+		upgradeButton.SetActive(false);
+		destroyButton.SetActive(false);
+	}
 }
 
 public enum ClickStates {

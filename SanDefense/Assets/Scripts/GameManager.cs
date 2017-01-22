@@ -101,6 +101,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	IEnumerator EndWave() {
+		Grid.TheGrid.HideAllButtons ();
 		waveState = WaveState.EndWave;
 		msgBox.Text = "Wave Over";
 		Invoke ("HideMessage", 2.0f);
@@ -113,6 +114,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	void StartSetup() {
+		Grid.TheGrid.SetClickState ("None");
 		msgBox.Text = "Setup";
 
 		castleHealthDisplay.value = maxCastleHP;
