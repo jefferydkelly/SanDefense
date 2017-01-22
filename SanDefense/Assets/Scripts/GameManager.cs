@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour {
 	int moneyAmount = 100;
     public int waveNumber;
 
-    public Wave wave;
+    public Tide wave;
     [SerializeField]
 	int maxCastleHP;
 
@@ -36,14 +36,14 @@ public class GameManager : MonoBehaviour {
 	bool won = false;
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
 		if (instance == null) {
 			instance = this;
 			msgBox = new ImageBoxWithBackground ("Message");
 			msgBox.Enabled = false;
 			hpText = castleHealthDisplay.GetComponentInChildren<Text>();
 			waveText = waveDisplay.GetComponentInChildren<Text> ();
-			moneyText.text = "\t" + moneyAmount.ToString();
+			moneyText.text = "Sand Dollars: " + moneyAmount.ToString();
             startWaveDelegate = () => {
 				StartWave ();
 			};
@@ -71,11 +71,9 @@ public class GameManager : MonoBehaviour {
 
             castleHealthDisplay.maxValue = maxCastleHP;
 
-
-			hpText.text = maxCastleHP + " / " + maxCastleHP;
+            hpText.text = "HP " + maxCastleHP + " / " + maxCastleHP;
 			yield return StartCoroutine(wave.RollTide (waveNumber+1));//randomWaveSize(waveNumber + 1);
-
-			StartSetup ();
+            StartSetup ();
 		} else if (paused) {
 			paused = false;
 		}
@@ -127,7 +125,7 @@ public class GameManager : MonoBehaviour {
 		waveNumber++;
 
         if (waveNumber < maxWaves) {
-			waveText.text = "\t" + waveNumber + " / " + maxWaves;
+			waveText.text = "Wave " + waveNumber + " / " + maxWaves;
 			waveDisplay.value = waveNumber;
 			currentCoroutine = StartCoroutine (gameObject.RunAfter (startWaveDelegate, 15));
 		} else {
@@ -143,7 +141,7 @@ public class GameManager : MonoBehaviour {
 	public void DamageCastle(int dmg) {
 		curCastleHP -= dmg;
 		castleHealthDisplay.value = curCastleHP;
-		hpText.text = curCastleHP + " / " + maxCastleHP;
+		hpText.text = "HP" + curCastleHP + " / " + maxCastleHP;
 		if (curCastleHP < 0) {
 			SceneManager.LoadScene ("GameOver");
 		}
@@ -185,7 +183,7 @@ public class GameManager : MonoBehaviour {
 
 		set {
 			moneyAmount = value;
-			moneyText.text = "\t" + moneyAmount.ToString();
+			moneyText.text = "Sand Dollars: " + moneyAmount.ToString();
 		}
 	}
 

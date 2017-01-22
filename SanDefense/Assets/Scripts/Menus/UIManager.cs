@@ -39,7 +39,7 @@ public class UIManager : MonoBehaviour {
 
 		set {
 			gameState = value;
-
+            
 			game.SetActive(gameState == GameStates.Game);
 			if (gameState == GameStates.Game) {
 				StartCoroutine(GameManager.Instance.StartGame ());
