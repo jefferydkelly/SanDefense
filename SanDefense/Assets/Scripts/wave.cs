@@ -15,21 +15,6 @@ public class Wave : MonoBehaviour {
 		startScale = transform.localScale;
 	}
 
-	public IEnumerator RollTide(int level) {
-		int zDif = Random.Range (1, Mathf.Min(level + 3, 6)) * 2;
-		waveSize = transform.position + new Vector3(0, 0, zDif);
-		yield return StartCoroutine (MoveForward());
-		if (level > 1) {
-			Debug.Log ("level");
-			Grid.TheGrid.ClearRocks ();
-			Grid.TheGrid.ScatterRocks (zDif);
-		}
-		yield return new WaitForSeconds (0.5f);
-		yield return StartCoroutine (MoveBackwards());
-
-
-	}
-
 	IEnumerator MoveForward() {
 		while (transform.position.z < waveSize.z) {
 			float scale = (transform.position.z - point0.z) / (waveSize.z - point0.z);

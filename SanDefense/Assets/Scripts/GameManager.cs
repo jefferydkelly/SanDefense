@@ -48,7 +48,7 @@ public class GameManager : MonoBehaviour {
 				StartWave ();
 			};
 			endWaveDelegate = () => {
-				StartCoroutine(EndWave ());
+				EndWave ();
 			};
 			startSetupDelegate = () => {
 				StartSetup();
@@ -102,15 +102,15 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
-	IEnumerator EndWave() {
+	void EndWave() {
 		Grid.TheGrid.HideAllButtons ();
 		waveState = WaveState.EndWave;
 		msgBox.Text = "Wave Over";
 		Invoke ("HideMessage", 2.0f);
-
+		Grid.TheGrid.ClearRocks ();
+		Grid.TheGrid.ScatterRocks (Random.Range (1, Mathf.Min (waveNumber + 3, 6)) * 2);
 		Grid.TheGrid.EndWave ();
-
-		yield return StartCoroutine(wave.RollTide (waveNumber + 1));
+		wave.RollTide (waveNumber + 1);
 
         currentCoroutine = StartCoroutine (gameObject.RunAfter(startSetupDelegate, 2));
 	}
