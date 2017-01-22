@@ -94,6 +94,7 @@ public class Tower : MonoBehaviour
         roundConstructed = GameManager.Instance.CurWave;
         particleSys = GetComponentInChildren<ParticleSystem>();
 		textMesh = GetComponentInChildren<TextMesh> ();
+		cost = (level + 1) * 25;
 		textMesh.text = "Level 1\nCost To Upgrade: " + ((level + 1) * 25);
 		textMesh.gameObject.SetActive (false);
 
@@ -262,7 +263,7 @@ public class Tower : MonoBehaviour
             radiusSqr = Mathf.Pow(radius, 2);
             bulletSpeed += 0.75f * level;
             particleSys.Play();
-			cost += 25 * level;
+			cost = 25 * (level + 1);
 			textMesh.text = "Level " + level;
 
 			if (level < maxLevel) {

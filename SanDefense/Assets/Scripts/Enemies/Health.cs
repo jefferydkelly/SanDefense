@@ -26,7 +26,7 @@ public class Health : MonoBehaviour {
 	void Start () {
 
         //Set the current health to the maximum health
-        currentHealth = maxHealth;
+		currentHealth = maxHealth + 25 * GameManager.Instance.waveNumber;
 
         //Get the health bar
         healthBar = gameObject.GetComponentsInChildren<Transform>()[1];

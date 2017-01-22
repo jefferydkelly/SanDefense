@@ -99,7 +99,7 @@ public class Grid : MonoBehaviour {
 				GameObject turret = clickState == ClickStates.BuildTurret ? Instantiate (towerPrefab) : Instantiate (wallPrefab);
 				selectedTile.Occupant = turret;
 				Vector3 ex = turret.GetComponent<Collider> ().bounds.extents;
-				turret.transform.position = selectedTile.transform.position + new Vector3 (-ex.x, ex.y, 0);
+				turret.transform.position = selectedTile.transform.position;// + new Vector3 (-ex.x, ex.y, 0);
 				selectedTile.Occupant.transform.parent = towerHolder.transform;
 
 				numTurrets++;
@@ -272,6 +272,7 @@ public class Grid : MonoBehaviour {
 			Destroy (go);
 		}
 		StopCoroutine (spawnRoutine);
+		spawnTime *= 0.9f;
 	}
 
 	/// <summary>
@@ -281,7 +282,7 @@ public class Grid : MonoBehaviour {
 	void SpawnEnemy() {
 		if (EnemyManager.Instance.Enemies.Count < maxEnemies) {
 			GameObject enemy = Instantiate (enemiePrefabs.RandomElement ());
-			enemy.transform.position = spawnTiles.RandomElement ().transform.position + new Vector3(0, enemy.GetComponent<Collider>().bounds.extents.y);
+			enemy.transform.position = spawnTiles.RandomElement ().transform.position;// + new Vector3(0, enemy.GetComponent<Collider>().bounds.extents.y);
 			EnemyManager.Instance.Enemies.AddExclusive (enemy);
 			enemy.transform.parent = enemyHolder.transform;
 		}
