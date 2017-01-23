@@ -50,7 +50,7 @@ public class Grid : MonoBehaviour {
 	// Use this for initialization
 	ClickStates clickState = ClickStates.None;
 	WaitDelegate spawnDelegate;
-	Coroutine spawnRoutine;
+	Timer spawnTimer;
 	void Start () {
 		instance = this;
 		int tileNum = 1;
@@ -88,10 +88,17 @@ public class Grid : MonoBehaviour {
 		directions.Add (new Vector3 (-1, 0, 0));
 		directions.Add (new Vector3 (0, 0, -1));
 		//cancelButton.SetActive (false);
+
 		ClickState = ClickStates.None;
 		towerText.text = "0 / " + maxTurrets;
+		NumTurrets = 0;
 	}
 
+	public void Reset() {
+		towerText.text = "0 / " + maxTurrets;
+		NumTurrets = 0;
+		Clear ();
+	}
 	public void BuildTower() {
 		if(GameManager.Instance.Funds >= 25) {
 			//Place down a tower
@@ -102,8 +109,7 @@ public class Grid : MonoBehaviour {
 				turret.transform.position = selectedTile.transform.position;// + new Vector3 (-ex.x, ex.y, 0);
 				selectedTile.Occupant.transform.parent = towerHolder.transform;
 
-				numTurrets++;
-				towerText.text = numTurrets + " / " + maxTurrets;
+				NumTurrets++;
 				GameManager.Instance.Funds -= 25;
 			}
 
@@ -135,10 +141,28 @@ public class Grid : MonoBehaviour {
 		}
 
 		selectedTower.Destroy();
-		numTurrets--;
-		towerText.text = numTurrets + " / " + maxTurrets;
+
 		ClickState = ClickStates.None;
 		SelectedTower = null;
+	}
+
+	public void TowerDestroyed() {
+		if (numTurrets > 0) {
+			NumTurrets--;
+		}
+	}
+
+	public int NumTurrets {
+		get {
+			return numTurrets;
+		}
+
+		private set {
+			if (value >= 0) {
+				numTurrets = value;
+				towerText.text = numTurrets + " / " + maxTurrets;
+			}
+		}
 	}
 	public void ClearRocks() {
 		List<Transform> rocks = rockHolder.GetComponentsInChildren<Transform> ().ToList();
@@ -264,14 +288,16 @@ public class Grid : MonoBehaviour {
 	}
 	public void StartWave() {
 		startButton.SetActive (false);
-		spawnRoutine = StartCoroutine (gameObject.RunAfterRepeating(spawnDelegate, spawnTime));
+		spawnTimer = new Timer (spawnDelegate, spawnTime);
+		spawnTimer.repeating = true;
+		TimerManager.Instance.AddTimer (spawnTimer);
 	}
 
 	public void EndWave() {
 		foreach (GameObject go in EnemyManager.Instance.Enemies) {
 			Destroy (go);
 		}
-		StopCoroutine (spawnRoutine);
+		TimerManager.Instance.RemoveTimer (spawnTimer);
 		spawnTime -= 0.05f;
 	}
 
@@ -351,7 +377,7 @@ public class Grid : MonoBehaviour {
 			Destroy (m.gameObject);
 		}
 
-		StopCoroutine (spawnRoutine);
+		TimerManager.Instance.RemoveTimer (spawnTimer);
 	}
 	public List<Tile> CalcPathToCastle(Vector3 startPos) {
 		Vector3 gridPos = startPos - startPosition;

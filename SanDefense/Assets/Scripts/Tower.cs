@@ -105,10 +105,6 @@ public class Tower : MonoBehaviour
     {
         if (!GameManager.Instance.IsPaused)
         {
-            
-
-            
-
 			if (!target || Vector3.Distance(target.transform.position, transform.position) > radius) {
 				DetermineTarget();
 			}
@@ -287,6 +283,10 @@ public class Tower : MonoBehaviour
             renderers[i].enabled = false;
         }
     }
+
+	void OnDestroy() {
+		Grid.TheGrid.TowerDestroyed ();
+	}
 
     void OnMouseEnter()
     {

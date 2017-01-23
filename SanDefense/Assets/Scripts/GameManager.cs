@@ -9,7 +9,9 @@ public class GameManager : MonoBehaviour {
 	bool paused = false;
 	int curCastleHP = 0;
     
-	int moneyAmount = 100;
+	[SerializeField]
+	int startMoney = 100;
+	int moneyAmount;
     public int waveNumber;
 
     public Tide wave;
@@ -32,6 +34,7 @@ public class GameManager : MonoBehaviour {
 	WaitDelegate startWaveDelegate;
 	WaitDelegate endWaveDelegate;
 	WaitDelegate startSetupDelegate;
+	Timer startWaveTimer;
 
 	bool won = false;
 
@@ -43,6 +46,8 @@ public class GameManager : MonoBehaviour {
 			msgBox.Enabled = false;
 			hpText = castleHealthDisplay.GetComponentInChildren<Text>();
 			waveText = waveDisplay.GetComponentInChildren<Text> ();
+			waveDisplay.maxValue = maxWaves;
+			moneyAmount = startMoney;
 			moneyText.text = "Sand Dollars: " + moneyAmount.ToString();
             startWaveDelegate = () => {
 				StartWave ();
@@ -53,6 +58,11 @@ public class GameManager : MonoBehaviour {
 			startSetupDelegate = () => {
 				StartSetup();
 			};
+		
+			WaitDelegate wd = () => {
+				Debug.Log ("Has it been one second?");
+			};
+
 			DontDestroyOnLoad (gameObject);
 		} else {
 			Destroy (gameObject);
@@ -93,12 +103,12 @@ public class GameManager : MonoBehaviour {
 	}
 	public void StartWave() {
 		if (waveState == WaveState.SetUp) {
-			StopCoroutine (currentCoroutine);
+			TimerManager.Instance.RemoveTimer (startWaveTimer);
 			waveState = WaveState.Wave;
 			msgBox.Text = "Wave " + waveNumber + " Start";
 			Invoke ("HideMessage", 2.0f);
 			Grid.TheGrid.StartWave ();
-			currentCoroutine = StartCoroutine (gameObject.RunAfter (endWaveDelegate, 15 * (waveNumber + 1)));
+			TimerManager.Instance.AddTimer (new Timer (endWaveDelegate, 15 * (waveNumber + 1)));
 		}
 	}
 
@@ -111,8 +121,7 @@ public class GameManager : MonoBehaviour {
 		Grid.TheGrid.ScatterRocks (Random.Range (1, Mathf.Min (waveNumber + 3, 6)) * 2);
 		Grid.TheGrid.EndWave ();
 		wave.RollTide (waveNumber + 1);
-
-        currentCoroutine = StartCoroutine (gameObject.RunAfter(startSetupDelegate, 2));
+		TimerManager.Instance.AddTimer (new Timer (startSetupDelegate, 2));
 	}
 
 	void StartSetup() {
@@ -128,7 +137,8 @@ public class GameManager : MonoBehaviour {
         if (waveNumber < maxWaves) {
 			waveText.text = "Wave " + waveNumber + " / " + maxWaves;
 			waveDisplay.value = waveNumber;
-			currentCoroutine = StartCoroutine (gameObject.RunAfter (startWaveDelegate, 15));
+			startWaveTimer = new Timer (startWaveDelegate, 15);
+			TimerManager.Instance.AddTimer (startWaveTimer);
 		} else {
 			won = true;
 			SceneManager.LoadScene ("GameOver");
@@ -166,8 +176,8 @@ public class GameManager : MonoBehaviour {
 
 	public void RestartGame() {
 		gameRunning = false;
-		Grid.TheGrid.Clear();
-		StopCoroutine (currentCoroutine);
+		Funds = startMoney;
+		Grid.TheGrid.Reset ();
 		UIManager.Instance.SetGameState ("Game");
 	}
 

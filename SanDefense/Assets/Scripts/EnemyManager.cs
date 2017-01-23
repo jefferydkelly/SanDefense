@@ -24,5 +24,4 @@ public class EnemyManager
     {
         get { return enemies; }
     }
-
 }
