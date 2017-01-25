@@ -63,7 +63,6 @@ public class Health : MonoBehaviour {
 		if (currentHealth <= 0)
 		{
             Instantiate(Drops[Random.Range(0,Drops.Length)], transform.position + Vector3.up * 1, Quaternion.identity);
-			EnemyManager.Instance.Enemies.Remove (gameObject);
             //Destroy(GetComponent<Movement>());
             //Destroy(GetComponentInChildren<Animator>());
             //foreach(GameObject limb in limbs)
@@ -82,4 +81,8 @@ public class Health : MonoBehaviour {
     {
         currentHealth += amount;
     }
+
+	void OnDestroy() {
+		EnemyManager.Instance.RemoveEnemy (gameObject);
+	}
 }
