@@ -83,6 +83,6 @@ public class Health : MonoBehaviour {
     }
 
 	void OnDestroy() {
-		EnemyManager.Instance.Enemies.Remove (gameObject);
+		EnemyManager.Instance.RemoveEnemy (gameObject);
 	}
 }

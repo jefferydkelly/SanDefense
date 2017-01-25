@@ -58,12 +58,24 @@ public class Timer {
 	WaitDelegate waitingOn;
 	float runTime;
 	float curTime;
-	public bool repeating = false;
+	public bool repeatingIndefinitely = false;
 	bool paused = false;
-	public Timer(WaitDelegate wd, float time) {
+	int repeatTimes = 0;
+	int timesRepeated = 0;
+	bool done = false;
+	public Timer(WaitDelegate wd, float time, bool repeat = false) {
 		waitingOn = wd;
 		runTime = time;
 		curTime = runTime;
+		repeatingIndefinitely = repeat;
+	}
+
+	public Timer(WaitDelegate wd, float time, int timesToRepeat) {
+		waitingOn = wd;
+		runTime = time;
+		curTime = runTime;
+		repeatingIndefinitely = false;
+		repeatTimes = timesToRepeat;
 	}
 
 	public bool Update(float dt) {
@@ -72,22 +84,36 @@ public class Timer {
 
 			if (curTime <= 0) {
 				waitingOn ();
-				if (repeating) {
+				timesRepeated++;
+				if (repeatingIndefinitely || timesRepeated < repeatTimes) {
 					curTime += runTime;
+					return false;
 				}
-
-				return !repeating;
+				done = true;
+				return true;
 			}
 		}
 
 		return false;
 	}
 
-	public void Pause() {
-		paused = true;
+	public bool IsPaused {
+		get {
+			return paused;
+		}
+
+		set {
+			paused = value;
+		}
 	}
 
-	public void Unpause() {
-		paused = false;
+	public bool IsDone {
+		get {
+			return done;
+		}
+	}
+
+	public void Reset() {
+		curTime = runTime;
 	}
 }

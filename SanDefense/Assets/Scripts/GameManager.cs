@@ -100,6 +100,12 @@ public class GameManager : MonoBehaviour {
 				UIManager.Instance.SetGameState ("Pause");
 			}
 		}
+
+		if (!paused) {
+			if (waveState == WaveState.Wave && EnemyManager.Instance.AllEnemiesKilled) {
+				EndWave ();
+			}
+		}
 	}
 	public void StartWave() {
 		if (waveState == WaveState.SetUp) {
@@ -108,7 +114,7 @@ public class GameManager : MonoBehaviour {
 			msgBox.Text = "Wave " + waveNumber + " Start";
 			Invoke ("HideMessage", 2.0f);
 			Grid.TheGrid.StartWave ();
-			TimerManager.Instance.AddTimer (new Timer (endWaveDelegate, 15 * (waveNumber + 1)));
+			//TimerManager.Instance.AddTimer (new Timer (endWaveDelegate, 15 * (waveNumber + 1)));
 		}
 	}
 

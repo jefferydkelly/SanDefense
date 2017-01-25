@@ -25,6 +25,8 @@ public class Grid : MonoBehaviour {
 	[SerializeField]
 	int maxTurrets;
 	int numTurrets = 0;
+	int monstersToSpawn = 0;
+	int monstersSpawned = 0;
 
 	//The UI
 	public GameObject buildButton;
@@ -77,11 +79,13 @@ public class Grid : MonoBehaviour {
 			spawnTiles.Add (spawn);
 			spawn.transform.parent = gridHolder.transform;
 			allTiles [i, 0] = spawn.gameObject;
-			spawnDelegate = () => {
-				SpawnEnemy ();
-			};
+
 		}
 
+		spawnDelegate = () => {
+			SpawnEnemy ();
+		};
+		spawnTimer = new Timer (spawnDelegate, spawnTime, true);
 		directions = new List<Vector3> ();
 		directions.Add (new Vector3 (1, 0, 0));
 		directions.Add (new Vector3 (0, 0, 1));
@@ -115,7 +119,7 @@ public class Grid : MonoBehaviour {
 
 			SelectedTile = null;
 
-			ClickState = ClickStates.None;
+			//ClickState = ClickStates.None;
 		}
 	}
 
@@ -124,7 +128,7 @@ public class Grid : MonoBehaviour {
 		{
 			GameManager.Instance.Funds -= SelectedTower.Cost;
 			selectedTower.Upgrade();
-			ClickState = ClickStates.None;
+			//ClickState = ClickStates.None;
 			SelectedTower = null;
 		}
 	}
@@ -142,7 +146,7 @@ public class Grid : MonoBehaviour {
 
 		selectedTower.Destroy();
 
-		ClickState = ClickStates.None;
+		//ClickState = ClickStates.None;
 		SelectedTower = null;
 	}
 
@@ -288,11 +292,19 @@ public class Grid : MonoBehaviour {
 	}
 	public void StartWave() {
 		startButton.SetActive (false);
-		spawnTimer = new Timer (spawnDelegate, spawnTime);
-		spawnTimer.repeating = true;
+		monstersSpawned = 0;
+		monstersToSpawn = 15 * (GameManager.Instance.CurWave + 1);
+		spawnTimer.Reset ();
+		EnemyManager.Instance.StartWave (monstersToSpawn);
+
 		TimerManager.Instance.AddTimer (spawnTimer);
 	}
 
+	public bool IsWaveDoneSpawning {
+		get {
+			return spawnTimer.IsDone && GameManager.Instance.WaveState == WaveState.Wave;
+		}
+	}
 	public void EndWave() {
 		foreach (GameObject go in EnemyManager.Instance.Enemies) {
 			Destroy (go);
@@ -311,6 +323,11 @@ public class Grid : MonoBehaviour {
 			enemy.transform.position = spawnTiles.RandomElement ().transform.position;// + new Vector3(0, enemy.GetComponent<Collider>().bounds.extents.y);
 			EnemyManager.Instance.Enemies.AddExclusive (enemy);
 			enemy.transform.parent = enemyHolder.transform;
+			monstersSpawned++;
+
+			if (monstersSpawned == monstersToSpawn) {
+				TimerManager.Instance.RemoveTimer (spawnTimer);
+			}
 		}
 	}
 
