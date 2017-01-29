@@ -13,6 +13,7 @@ public class CameraController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		/*
 		Vector3 dir = new Vector3 ((Input.GetKey (KeyCode.W) ? 1 : 0) - (Input.GetKey (KeyCode.S) ? 1 : 0), 0,
 			              (Input.GetKey (KeyCode.A) ? 1 : 0) - (Input.GetKey (KeyCode.D) ? 1 : 0));
 
@@ -23,5 +24,6 @@ public class CameraController : MonoBehaviour {
 		newPos.y =  Mathf.Clamp (newPos.y, min.y, max.y);
 		newPos.z = Mathf.Clamp (newPos.z, min.z, max.z);
 		transform.position = newPos;
+		*/
 	}
 }

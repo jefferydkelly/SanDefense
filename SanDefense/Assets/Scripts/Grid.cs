@@ -98,6 +98,19 @@ public class Grid : MonoBehaviour {
 		NumTurrets = 0;
 	}
 
+	void Update() {
+		if (Input.GetKeyDown (KeyCode.Q)) {
+			ClickState = ClickStates.BuildTurret;
+		} else if (Input.GetKeyDown (KeyCode.W)) {
+			ClickState = ClickStates.UpgradeTurret;
+		} else if (Input.GetKeyDown (KeyCode.E)) {
+			ClickState = ClickStates.DestroyTurret;
+		} else if (Input.GetKeyDown (KeyCode.R)) {
+			ClickState = ClickStates.None;
+		} else if (Input.GetKeyDown (KeyCode.G) && clickState == ClickStates.None && GameManager.Instance.WaveState == WaveState.SetUp) {
+			GameManager.Instance.StartWave ();
+		}
+	}
 	public void Reset() {
 		towerText.text = "0 / " + maxTurrets;
 		NumTurrets = 0;
@@ -550,11 +563,12 @@ public class Grid : MonoBehaviour {
 	}
 
 	void HideButtons(bool hideBuildUpgradeDestory) {
-		cancelButton.SetActive(hideBuildUpgradeDestory);
-		buildButton.SetActive(!hideBuildUpgradeDestory);
-		upgradeButton.SetActive(!hideBuildUpgradeDestory);
-		destroyButton.SetActive(!hideBuildUpgradeDestory);
-		startButton.SetActive(!hideBuildUpgradeDestory && GameManager.Instance.WaveState != WaveState.Wave);
+		bool isNone = ClickState == ClickStates.None;
+		cancelButton.SetActive(!isNone);
+		buildButton.SetActive(ClickState == ClickStates.BuildTurret || isNone);
+		upgradeButton.SetActive(ClickState == ClickStates.UpgradeTurret || isNone);
+		destroyButton.SetActive(ClickState == ClickStates.DestroyTurret || isNone);
+		startButton.SetActive(isNone && GameManager.Instance.WaveState != WaveState.Wave);
 
 	}
 
