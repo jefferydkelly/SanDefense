@@ -1,119 +1,232 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
-public class TimerManager : MonoBehaviour {
+public delegate void TimerDelegate();
+public class TimerManager
+{
+	static TimerManager instance;
+	List<Timer> timers;
+	List<Timer> toAdd;
+	List<Timer> toRemove;
 
-	static TimerManager instance = null;
-	List<Timer> timers = new List<Timer> ();
-	List<Timer> toRemove = new List<Timer> ();
-	List<Timer> toAdd = new List<Timer> ();
-	// Use this for initialization
-	void Awake () {
-		if (instance == null) {
-			instance = this;
-		} else {
-			Destroy (gameObject);
-		}
+	/// <summary>
+	/// Initializes a new instance of the <see cref="T:TimerManager"/> class.
+	/// </summary>
+	public TimerManager()
+	{
+		timers = new List<Timer>();
+		toAdd = new List<Timer>();
+		toRemove = new List<Timer>();
 	}
-	
-	// Update is called once per frame
-	void Update () {
 
-		foreach (Timer t in toAdd) {
-			timers.Add (t);
-		}
-		toAdd = new List<Timer> ();
-		if (!GameManager.Instance.IsPaused) {
-			float dt = Time.deltaTime;
-			foreach (Timer t in timers) {
-				if (t.Update (dt)) {
-					toRemove.Add (t);
-				}
+	/// <summary>
+	/// Adds the timer to the array to be added.
+	/// </summary>
+	/// <param name="t">T.</param>
+	public void AddTimer(Timer t)
+	{
+		toAdd.Add(t);
+	}
+
+	/// <summary>
+	/// Adds the timer to the list of timers to be removed.
+	/// </summary>
+	/// <param name="t">T.</param>
+	public void RemoveTimer(Timer t)
+	{
+		toRemove.Add(t);
+	}
+
+	/// <summary>
+	/// Gets the instance.
+	/// </summary>
+	/// <value>The instance.</value>
+	public static TimerManager Instance
+	{
+		get
+		{
+			if (instance == null)
+			{
+				instance = new TimerManager();
 			}
-		}
-
-		foreach (Timer t in toRemove) {
-			timers.Remove (t);
-		}
-		toRemove = new List<Timer> ();
-	}
-
-	public static TimerManager Instance {
-		get {
 			return instance;
 		}
 	}
 
-	public void AddTimer(Timer t) {
-		toAdd.Add (t);
-	}
+	/// <summary>
+	/// Update all the currently active timers.
+	/// </summary>
+	/// <returns>The update.</returns>
+	/// <param name="dt">Dt.</param>
+	public void Update(float dt)
+	{
+		foreach (Timer t in toAdd)
+		{
+			timers.Add(t);
+		}
+		toAdd.Clear();
+		foreach (Timer t in timers)
+		{
+			t.Update(dt);
+		}
 
-	public void RemoveTimer(Timer t) {
-		toRemove.Add (t);
+		foreach (Timer t in toRemove)
+		{
+			timers.Remove(t);
+		}
+
+		toRemove.Clear();
 	}
 }
 
-public class Timer {
-	WaitDelegate waitingOn;
-	float runTime;
-	float curTime;
-	public bool repeatingIndefinitely = false;
-	bool paused = false;
-	int repeatTimes = 0;
-	int timesRepeated = 0;
-	bool done = false;
-	public Timer(WaitDelegate wd, float time, bool repeat = false) {
-		waitingOn = wd;
+public class Timer
+{
+	float runTime = 0;
+	float curTime = 0;
+	int numRepeats = 0;
+	int timesRun = 0;
+	bool infinite = false;
+	TimerState state;
+	public UnityEvent OnTick;
+	public UnityEvent OnComplete;
+	/// <summary>
+	/// Initializes a new instance of the <see cref="T:Timer"/> class.
+	/// </summary>
+	/// <param name="td">The function to be run when the timer ticks.</param>
+	/// <param name="time">The time between ticks.</param>
+	/// <param name="reps">The number of times the timer will tick beyond the first.</param>
+	public Timer(float time, int reps)
+	{
 		runTime = time;
-		curTime = runTime;
-		repeatingIndefinitely = repeat;
+		numRepeats = reps;
+		infinite = false;
+		OnTick = new UnityEvent();
+		OnComplete = new UnityEvent();
 	}
 
-	public Timer(WaitDelegate wd, float time, int timesToRepeat) {
-		waitingOn = wd;
+	/// <summary>
+	/// Initializes a new instance of the <see cref="T:Timer"/> class.
+	/// </summary>
+	/// <param name="td">The function to be run when the timer ticks.</param>
+	/// <param name="time">The time between ticks.</param>
+	/// <param name="inf">If set to <c>true</c> the timer will run until it is stopped.</param>
+	public Timer(float time, bool inf = false)
+	{
 		runTime = time;
-		curTime = runTime;
-		repeatingIndefinitely = false;
-		repeatTimes = timesToRepeat;
+		numRepeats = 0;
+		infinite = inf;
+		OnTick = new UnityEvent();
+		OnComplete = new UnityEvent();
 	}
 
-	public bool Update(float dt) {
-		if (!paused) {
-			curTime -= dt;
+	/// <summary>
+	/// Start this instance.
+	/// </summary>
+	public void Start()
+	{
+		if (state == TimerState.NotStarted || state == TimerState.Done || state == TimerState.Stopped)
+		{
+			state = TimerState.Running;
+			curTime = 0;
+            timesRun = 0;
+			TimerManager.Instance.AddTimer(this);
+		}
 
-			if (curTime <= 0) {
-				waitingOn ();
-				timesRepeated++;
-				if (repeatingIndefinitely || timesRepeated < repeatTimes) {
-					curTime += runTime;
-					return false;
+	}
+
+	/// <summary>
+	/// Pause this instance.
+	/// </summary>
+	public void Pause()
+	{
+		if (state == TimerState.Running)
+		{
+			state = TimerState.Paused;
+		}
+	}
+
+	/// <summary>
+	/// Unpause this instance.
+	/// </summary>
+	public void Unpause()
+	{
+		if (state == TimerState.Paused)
+		{
+			state = TimerState.Running;
+		}
+	}
+
+	/// <summary>
+	/// Stop this instance.
+	/// </summary>
+	public void Stop()
+	{
+		state = TimerState.Stopped;
+		TimerManager.Instance.RemoveTimer(this);
+	}
+
+	/// <summary>
+	/// Update the timer.
+	/// </summary>
+	/// <returns>The update.</returns>
+	/// <param name="dt">Dt.</param>
+	public void Update(float dt)
+	{
+		if (state == TimerState.Running)
+		{
+			curTime += dt;
+			if (curTime >= runTime)
+			{
+				curTime -= runTime;
+				OnTick.Invoke();
+				timesRun++;
+
+				if (timesRun > numRepeats && !infinite)
+				{
+					OnComplete.Invoke();
+					state = TimerState.Done;
+					TimerManager.Instance.RemoveTimer(this);
 				}
-				done = true;
-				return true;
+
 			}
 		}
-
-		return false;
 	}
 
-	public bool IsPaused {
-		get {
-			return paused;
-		}
-
-		set {
-			paused = value;
-		}
-	}
-
-	public bool IsDone {
-		get {
-			return done;
+	/// <summary>
+	/// Gets a value indicating whether this <see cref="T:Timer"/> is running.
+	/// </summary>
+	/// <value><c>true</c> if is running; otherwise, <c>false</c>.</value>
+	public bool IsRunning
+	{
+		get
+		{
+			return state == TimerState.Running;
 		}
 	}
 
-	public void Reset() {
-		curTime = runTime;
-	}
+    public bool IsDone {
+        get {
+            return state == TimerState.Done;
+        }
+    }
+
+    public bool IsStopped {
+        get {
+            return state == TimerState.Stopped;
+        }
+    }
+}
+
+/// <summary>
+/// Timer states.
+/// </summary>
+public enum TimerState
+{
+	NotStarted,
+	Running,
+	Stopped,
+	Paused,
+	Done
 }

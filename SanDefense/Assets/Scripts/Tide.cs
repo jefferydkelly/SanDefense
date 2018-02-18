@@ -24,8 +24,8 @@ public class Tide : MonoBehaviour
         //yield return StartCoroutine(MoveForward());
         if (level > 1)
         {
-            Grid.TheGrid.ClearRocks();
-            Grid.TheGrid.ScatterRocks(zDif);
+            GridManager.TheGrid.ClearRocks();
+            GridManager.TheGrid.ScatterRocks(zDif);
         }
         //yield return new WaitForSeconds(0.5f);
         //yield return StartCoroutine(MoveBackwards());

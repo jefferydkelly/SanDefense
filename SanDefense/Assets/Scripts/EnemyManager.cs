@@ -46,12 +46,16 @@ public class EnemyManager
 		if (enemies.Remove (go)) {
 			enemiesKilledSlider.value++;
 			ekText.text = enemiesKilledSlider.value + " / " + enemiesKilledSlider.maxValue;
+
+            if (AllEnemiesKilled) {
+                EventManager.Instance.TriggerEvent("WaveOver");
+            }
 		}
 	}
 
-	public bool AllEnemiesKilled {
+	bool AllEnemiesKilled {
 		get {
-			return enemiesKilledSlider.value == enemiesKilledSlider.maxValue;
+			return (int)enemiesKilledSlider.value == (int)enemiesKilledSlider.maxValue;
 		}
 	}
 }

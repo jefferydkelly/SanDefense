@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
-public class Grid : MonoBehaviour {
+public class GridManager : MonoBehaviour {
 	public Vector3 startPosition = new Vector3(-5, 0, -5);
 	/// <summary>
 	/// Prefabs
@@ -34,13 +34,13 @@ public class Grid : MonoBehaviour {
 	public GameObject upgradeButton;
 	public GameObject cancelButton;
 	public GameObject startButton;
-	private static Grid instance;
+	private static GridManager instance;
 	public Vector2 gridSize = new Vector2(10, 10);
 
-	Tile selectedTile;
+	SandTile selectedTile;
 	Tower selectedTower;
 
-	Tile[,] tiles;
+	SandTile[,] tiles;
 	GameObject[,] allTiles;
 	List<GameObject> spawnTiles = new List<GameObject>();
 
@@ -57,40 +57,41 @@ public class Grid : MonoBehaviour {
 		instance = this;
 		int tileNum = 1;
 		GameObject gridHolder = new GameObject ("Grid");
+        gridHolder.transform.position = startPosition;
 		towerHolder = new GameObject ("Towers");
 		enemyHolder = new GameObject ("Enemies");
 		rockHolder = new GameObject ("Rocks");
-		tiles = new Tile[(int)gridSize.x, (int)gridSize.y];
+		tiles = new SandTile[(int)gridSize.x, (int)gridSize.y];
 		allTiles = new GameObject[(int)gridSize.x, (int)gridSize.y + 1];
+        float tileScale = GameManager.Instance.Scale;
 		for (int i = 0; i < gridSize.y; i++) {
 			for (int j = 0; j < gridSize.x; j++) {
-				GameObject tile = Instantiate (tilePrefab);
-				tile.transform.position = startPosition + new Vector3 (i, 0, j);
+                SandTile tile = Instantiate (tilePrefab).GetComponent<SandTile>();
+                tile.transform.SetParent(gridHolder.transform);
+                tile.transform.localScale = new Vector3(tileScale, tile.transform.localScale.y, tileScale);
+				tile.gridPos = new Vector3(i, j);
+                tile.transform.localPosition = new Vector3 (i * tileScale, 0, j * tileScale);
 				tile.name = "Tile " + tileNum;
 				tileNum++;
-				tiles[i, j] = tile.GetComponent<Tile>();
-				allTiles [i, j+1] = tile;
-				tile.transform.parent = gridHolder.transform;
-				tiles [i, j].gridPos = new Vector2 (i, j);
+				tiles[i, j] = tile;
+                allTiles [i, j+1] = tile.gameObject;
+				
 			}
 
 			GameObject spawn = Instantiate (spawnPrefab);
-			spawn.transform.position = startPosition + new Vector3 (i, 0, -1);
 			spawnTiles.Add (spawn);
-			spawn.transform.parent = gridHolder.transform;
+            spawn.transform.SetParent(gridHolder.transform);
+            spawn.transform.localScale = new Vector3(tileScale, spawn.transform.localScale.y, tileScale);
+            spawn.transform.localPosition = new Vector3(i * tileScale, 0, -tileScale);
 			allTiles [i, 0] = spawn.gameObject;
 
 		}
 
-		spawnDelegate = () => {
-			SpawnEnemy ();
-		};
-		spawnTimer = new Timer (spawnDelegate, spawnTime, true);
 		directions = new List<Vector3> ();
-		directions.Add (new Vector3 (1, 0, 0));
-		directions.Add (new Vector3 (0, 0, 1));
-		directions.Add (new Vector3 (-1, 0, 0));
-		directions.Add (new Vector3 (0, 0, -1));
+        directions.Add (new Vector3 (tileScale, 0, 0));
+        directions.Add (new Vector3 (0, 0, tileScale));
+        directions.Add (new Vector3 (-tileScale, 0, 0));
+        directions.Add (new Vector3 (0, 0, -tileScale));
 		//cancelButton.SetActive (false);
 
 		ClickState = ClickStates.None;
@@ -122,9 +123,9 @@ public class Grid : MonoBehaviour {
 			if (numTurrets < maxTurrets) {
 				GameObject turret = clickState == ClickStates.BuildTurret ? Instantiate (towerPrefab) : Instantiate (wallPrefab);
 				selectedTile.Occupant = turret;
+                turret.transform.position = selectedTile.transform.position;
 				Vector3 ex = turret.GetComponent<Collider> ().bounds.extents;
-				turret.transform.position = selectedTile.transform.position;// + new Vector3 (-ex.x, ex.y, 0);
-				selectedTile.Occupant.transform.parent = towerHolder.transform;
+                turret.transform.SetParent(towerHolder.transform);
 
 				NumTurrets++;
 				GameManager.Instance.Funds -= 25;
@@ -194,7 +195,7 @@ public class Grid : MonoBehaviour {
 			int numRocks = Random.Range (1, 5);
 			for (int i = 0; i < numRocks; i++) {
 				int numTries = 0;
-				Tile t;
+				SandTile t;
 				bool pathClear;
 				do {
 					int x = Random.Range (1, (int)gridSize.x - 1);
@@ -218,18 +219,18 @@ public class Grid : MonoBehaviour {
 		}
 	}
 
-	public bool IsPathClear(Tile tile) {
+	public bool IsPathClear(SandTile tile) {
 		tile.TestAsOccupied = true;
 		Vector3 startPos = tiles [0, 0].transform.position;
-		Vector3 gridPos = startPos - startPosition;
+        Vector2 gridPos = Vector2.zero;
 		int numTiles = (int)gridSize.x * (int)gridSize.y;
-		Tile start = GetTileAt (startPos);
-		Vector3 dest = new Vector3 (startPos.x, startPos.y, (startPosition.x + gridSize.y));
-		Tile goal = GetTileAt(dest);
+		SandTile start = tiles[0,0];
+        Vector3 dest = startPos.SetZ(startPosition.x + gridSize.y);//new Vector3 (startPos.x, startPos.y, (startPosition.x + gridSize.y));
+		SandTile goal = GetTileAt(dest);
 		int offset = 1;
 		while (goal.Occupied) {
 			dest = new Vector3 (startPos.x + offset, startPos.y, (startPosition.x + gridSize.y));
-			Tile test = GetTileAt(dest);
+			SandTile test = GetTileAt(dest);
 			if (test) {
 				goal = test;
 			}
@@ -238,15 +239,15 @@ public class Grid : MonoBehaviour {
 				offset++;
 			}
 		}
-		List<Tile> closedSet = new List<Tile> ();
-		List<Tile> openSet = new List<Tile> ();
+		List<SandTile> closedSet = new List<SandTile> ();
+		List<SandTile> openSet = new List<SandTile> ();
 		openSet.Add (start);
 
-		int curIndex = (int)(gridPos.z * gridSize.y + gridPos.x);
+		int curIndex = (int)(gridPos.y * gridSize.y + gridPos.x);
 		float[] gScore = new float[numTiles];
 		gScore [curIndex] = 0;
 		float[] fScore = new float[numTiles];
-		Tile[] cameFrom = new Tile[numTiles];
+		SandTile[] cameFrom = new SandTile[numTiles];
 		for (int i = 0; i < numTiles; i++) {
 			cameFrom [i] = null;
 		}
@@ -258,17 +259,17 @@ public class Grid : MonoBehaviour {
 		fScore [curIndex] = (int)(gridSize.y - startPos.z);
 
 		while (!openSet.IsEmpty ()) {
-			openSet.Sort (delegate(Tile x, Tile y) {
-				Vector3 xPos = x.transform.position - startPosition;
-				int xInd = (int)(xPos.z * gridSize.y + xPos.x);
-				Vector3 yPos = y.transform.position - startPosition;
-				int yInd = (int)(yPos.z * gridSize.y + yPos.x);
+			openSet.Sort (delegate(SandTile x, SandTile y) {
+                Vector2 xPos = x.gridPos;
+				int xInd = (int)(xPos.y * gridSize.y + xPos.x);
+                Vector2 yPos = y.gridPos;
+				int yInd = (int)(yPos.y * gridSize.y + yPos.x);
 				return fScore[xInd].CompareTo(fScore[yInd]);
 			});
 
-			Tile current = openSet [0];
-			gridPos = current.transform.position - startPosition;
-			curIndex = (int)(gridPos.z * gridSize.y + gridPos.x);
+			SandTile current = openSet [0];
+            gridPos = current.gridPos;
+			curIndex = (int)(gridPos.y * gridSize.y + gridPos.x);
 			if (Vector3.Equals(current.transform.position, goal.transform.position)) {
 				tile.TestAsOccupied = false;
 				return true;
@@ -277,13 +278,13 @@ public class Grid : MonoBehaviour {
 			openSet.Remove (current);
 			closedSet.Add (current);
 
-			foreach (Tile t in TestNeighbors(current)) {
+			foreach (SandTile t in TestNeighbors(current)) {
 
 				if (closedSet.Contains (t)) {
 					continue;
 				}
-				Vector3 newGridPos = t.transform.position - startPosition;
-				int tIndex = (int)(newGridPos.z * gridSize.y + newGridPos.x);
+                Vector3 newGridPos = t.gridPos;
+				int tIndex = (int)(newGridPos.y * gridSize.y + newGridPos.x);
 				float tentativeGScore = gScore [curIndex] + 1;
 
 				if (!openSet.Contains (t)) {
@@ -307,10 +308,12 @@ public class Grid : MonoBehaviour {
 		startButton.SetActive (false);
 		monstersSpawned = 0;
 		monstersToSpawn = 15 * (GameManager.Instance.CurWave + 1);
-		spawnTimer.Reset ();
+		
 		EnemyManager.Instance.StartWave (monstersToSpawn);
 
-		TimerManager.Instance.AddTimer (spawnTimer);
+		spawnTimer = new Timer(spawnTime, true);
+		spawnTimer.OnTick.AddListener(SpawnEnemy);
+        spawnTimer.Start();
 	}
 
 	public bool IsWaveDoneSpawning {
@@ -322,7 +325,6 @@ public class Grid : MonoBehaviour {
 		foreach (GameObject go in EnemyManager.Instance.Enemies) {
 			Destroy (go);
 		}
-		TimerManager.Instance.RemoveTimer (spawnTimer);
 		spawnTime -= 0.05f;
 	}
 
@@ -331,40 +333,39 @@ public class Grid : MonoBehaviour {
 	/// </summary>
 	/// <param name="go">The prefab of the enemy to be spawned.</param>
 	void SpawnEnemy() {
+      
 		if (EnemyManager.Instance.Enemies.Count < maxEnemies) {
 			GameObject enemy = Instantiate (enemiePrefabs.RandomElement ());
 			enemy.transform.position = spawnTiles.RandomElement ().transform.position;// + new Vector3(0, enemy.GetComponent<Collider>().bounds.extents.y);
 			EnemyManager.Instance.Enemies.AddExclusive (enemy);
-			enemy.transform.parent = enemyHolder.transform;
+            enemy.transform.SetParent(enemyHolder.transform);
 			monstersSpawned++;
 
 			if (monstersSpawned == monstersToSpawn) {
-				TimerManager.Instance.RemoveTimer (spawnTimer);
+                spawnTimer.Stop();
 			}
 		}
 	}
 
-	public Tile GetTileAt(Vector3 v) {
-		Vector3 gridPos = v - startPosition;
-
+	public SandTile GetTileAt(Vector3 v) {
+        Vector3 gridPos = (v - startPosition) / GameManager.Instance.Scale;
 		if (gridPos.x >= 0 && gridPos.x < gridSize.x) {
 
 			if (gridPos.z >= 0 && gridPos.z < gridSize.y) {
-				Tile t = tiles [(int)gridPos.x, (int)gridPos.z];
+				SandTile t = tiles [(int)gridPos.x, (int)gridPos.z];
 				return t;
 			}
 		}
-
 		return null;
 	}
 
-	public static Grid TheGrid {
+	public static GridManager TheGrid {
 		get {
 			return instance;
 		}
 	}
 
-	public Tile SelectedTile {
+	public SandTile SelectedTile {
 		get {
 			return selectedTile;
 		}
@@ -409,16 +410,23 @@ public class Grid : MonoBehaviour {
 
 		TimerManager.Instance.RemoveTimer (spawnTimer);
 	}
-	public List<Tile> CalcPathToCastle(Vector3 startPos) {
-		Vector3 gridPos = startPos - startPosition;
+	public List<SandTile> CalcPathToCastle(Vector3 startPos) {
+        
+        SandTile start = GetTileAt(startPos);
+
+        if (start == null) {
+            Debug.Log(startPos);
+            Debug.Break();
+        }
+        Vector2 gridPos = start.gridPos;
 		int numTiles = (int)gridSize.x * (int)gridSize.y;
-		Tile start = GetTileAt (startPos);
+		
 		Vector3 dest = new Vector3 (startPos.x, startPos.y, (startPosition.x + gridSize.y));
-		Tile goal = GetTileAt(dest);
+		SandTile goal = GetTileAt(dest);
 		int offset = 1;
 		while (goal.Occupied) {
 			dest = new Vector3 (startPos.x + offset, startPos.y, (startPosition.x + gridSize.y));
-			Tile test = GetTileAt(dest);
+			SandTile test = GetTileAt(dest);
 			if (test) {
 				goal = test;
 			}
@@ -427,15 +435,15 @@ public class Grid : MonoBehaviour {
 				offset++;
 			}
 		}
-		List<Tile> closedSet = new List<Tile> ();
-		List<Tile> openSet = new List<Tile> ();
+		List<SandTile> closedSet = new List<SandTile> ();
+		List<SandTile> openSet = new List<SandTile> ();
 		openSet.Add (start);
 
-		int curIndex = (int)(gridPos.z * gridSize.y + gridPos.x);
+		int curIndex = (int)(gridPos.y * gridSize.y + gridPos.x);
 		float[] gScore = new float[numTiles];
 		gScore [curIndex] = 0;
 		float[] fScore = new float[numTiles];
-		Tile[] cameFrom = new Tile[numTiles];
+		SandTile[] cameFrom = new SandTile[numTiles];
 		for (int i = 0; i < numTiles; i++) {
 			cameFrom [i] = null;
 		}
@@ -447,7 +455,7 @@ public class Grid : MonoBehaviour {
 		fScore [curIndex] = (int)(gridSize.y - startPos.z);
 
 		while (!openSet.IsEmpty ()) {
-			openSet.Sort (delegate(Tile x, Tile y) {
+			openSet.Sort (delegate(SandTile x, SandTile y) {
 				Vector3 xPos = x.transform.position - startPosition;
 				int xInd = (int)(xPos.z * gridSize.y + xPos.x);
 				Vector3 yPos = y.transform.position - startPosition;
@@ -455,11 +463,11 @@ public class Grid : MonoBehaviour {
 				return fScore[xInd].CompareTo(fScore[yInd]);
 			});
 
-			Tile current = openSet [0];
+			SandTile current = openSet [0];
 			gridPos = current.transform.position - startPosition;
-			curIndex = (int)(gridPos.z * gridSize.y + gridPos.x);
+			curIndex = (int)(gridPos.y * gridSize.y + gridPos.x);
 			if (Vector3.Equals(current.transform.position, goal.transform.position)) {
-				List<Tile> path = ReconstructPath (cameFrom, current);
+				List<SandTile> path = ReconstructPath (cameFrom, current);
 				path.Remove (path [0]);
 				return path;
 			}
@@ -467,7 +475,7 @@ public class Grid : MonoBehaviour {
 			openSet.Remove (current);
 			closedSet.Add (current);
 
-			foreach (Tile t in GetNeighbors(current)) {
+			foreach (SandTile t in GetNeighbors(current)) {
 				
 				if (closedSet.Contains (t)) {
 					continue;
@@ -495,12 +503,12 @@ public class Grid : MonoBehaviour {
 		return null;
 	}
 
-	List<Tile> TestNeighbors(Tile t) {
-		List<Tile> neighbors = new List<Tile> ();
+	List<SandTile> TestNeighbors(SandTile t) {
+		List<SandTile> neighbors = new List<SandTile> ();
 
 		foreach (Vector3 v in directions) {
 			//Judgment Day = t2
-			Tile judgmentday = GetTileAt(t.transform.position + v);
+			SandTile judgmentday = GetTileAt(t.transform.position + v);
 
 			if (judgmentday && !judgmentday.Occupied && !judgmentday.TestAsOccupied) {
 				neighbors.Add (judgmentday);
@@ -509,12 +517,12 @@ public class Grid : MonoBehaviour {
 
 		return neighbors;
 	}
-	List<Tile> GetNeighbors(Tile t) {
-		List<Tile> neighbors = new List<Tile> ();
+	List<SandTile> GetNeighbors(SandTile t) {
+		List<SandTile> neighbors = new List<SandTile> ();
 
 		foreach (Vector3 v in directions) {
 			//Judgment Day = t2
-			Tile judgmentday = GetTileAt(t.transform.position + v);
+			SandTile judgmentday = GetTileAt(t.transform.position + v);
 
 			if (judgmentday && !judgmentday.Occupied) {
 				neighbors.Add (judgmentday);
@@ -524,8 +532,8 @@ public class Grid : MonoBehaviour {
 		return neighbors;
 	}
 
-	List<Tile> ReconstructPath(Tile[] cameFrom, Tile current) {
-		List<Tile> totalPath = new List<Tile> ();
+	List<SandTile> ReconstructPath(SandTile[] cameFrom, SandTile current) {
+		List<SandTile> totalPath = new List<SandTile> ();
 		totalPath.Add (current);
 		Vector3 gridPos = current.transform.position - startPosition;
 		int index = (int)(gridPos.z * gridSize.y + gridPos.x);

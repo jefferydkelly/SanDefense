@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SandDollar : MonoBehaviour
+public class SandDollar : ClickableObject
 {
+    [SerializeField]
+    int value = 5;
 
-    public int value = 5;
-
-    void OnMouseDown()
+    public override void OnClick()
     {
         GetComponentInChildren<Animator>().SetBool("Collected", true);
         Destroy(gameObject, .75f);

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tile : MonoBehaviour {
+public class SandTile : ClickableObject {
 	GameObject occupant;
 	Renderer myRenderer;
 	bool testAsOccupied = false;
@@ -12,13 +12,13 @@ public class Tile : MonoBehaviour {
 		myRenderer = GetComponent<Renderer> ();
 	}
 	
-	// Update is called once per frame
+	// Update is called once per frameq
 	void Update () {
 		
 	}
 
 	/// <summary>
-	/// Gets a value indicating whether this <see cref="Tile"/> is occupied.
+	/// Gets a value indicating whether this <see cref="SandTile"/> is occupied.
 	/// </summary>
 	/// <value><c>true</c> if occupied; otherwise, <c>false</c>.</value>
 	public bool Occupied {
@@ -42,7 +42,7 @@ public class Tile : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// Sets a value indicating whether this <see cref="Tile"/> is selected.
+	/// Sets a value indicating whether this <see cref="SandTile"/> is selected.
 	/// </summary>
 	/// <value><c>true</c> if selected; otherwise, <c>false</c>.</value>
 	public bool Selected {
@@ -66,24 +66,34 @@ public class Tile : MonoBehaviour {
 	}
 		
 	void OnMouseEnter() {
-		if (Grid.TheGrid.ClickState == ClickStates.BuildTurret && !Occupied && Grid.TheGrid.IsPathClear(this)) {
+		if (GridManager.TheGrid.ClickState == ClickStates.BuildTurret && !Occupied && GridManager.TheGrid.IsPathClear(this)) {
 			if (gridPos.y > 0) {
-				Grid.TheGrid.SelectedTile = this;
+				GridManager.TheGrid.SelectedTile = this;
 			}
 		}
 	}
 
 	void OnMouseExit() {
-		if (Grid.TheGrid.ClickState == ClickStates.BuildTurret) {
-			Grid.TheGrid.SelectedTile = null;
+		if (GridManager.TheGrid.ClickState == ClickStates.BuildTurret) {
+			GridManager.TheGrid.SelectedTile = null;
 		}
 	}
 
-	void OnMouseUp() {
-		if (Selected) {
-			if (gridPos.y > 0) {
-				Grid.TheGrid.BuildTower ();
+    public override void OnUnclick()
+    {
+		if (Selected)
+		{
+			if (gridPos.y > 0)
+			{
+				GridManager.TheGrid.BuildTower();
 			}
 		}
-	}
+    }
+
+    public override void OnClick()
+    {
+        if (Application.isMobilePlatform) {
+            OnMouseEnter();
+        }
+    }
 }

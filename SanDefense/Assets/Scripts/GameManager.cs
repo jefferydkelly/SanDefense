@@ -31,12 +31,10 @@ public class GameManager : MonoBehaviour {
 	bool gameRunning = false;
 
 	Coroutine currentCoroutine;
-	WaitDelegate startWaveDelegate;
-	WaitDelegate endWaveDelegate;
-	WaitDelegate startSetupDelegate;
 	Timer startWaveTimer;
 
 	bool won = false;
+    float gameScale = 1.0f;
 
 	// Use this for initialization
 	void Awake () {
@@ -49,20 +47,13 @@ public class GameManager : MonoBehaviour {
 			waveDisplay.maxValue = maxWaves;
 			moneyAmount = startMoney;
 			moneyText.text = "Sand Dollars: " + moneyAmount.ToString();
-            startWaveDelegate = () => {
-				StartWave ();
-			};
-			endWaveDelegate = () => {
-				EndWave ();
-			};
-			startSetupDelegate = () => {
-				StartSetup();
-			};
-		
-			WaitDelegate wd = () => {
-				Debug.Log ("Has it been one second?");
-			};
-
+         
+			startWaveTimer = new Timer(15);
+			startWaveTimer.OnComplete.AddListener(StartWave);
+            EventManager.StartListening("WaveOver", EndWave);
+            if (!Application.isMobilePlatform) {
+                gameScale = 2.0f;
+            }
 			DontDestroyOnLoad (gameObject);
 		} else {
 			Destroy (gameObject);
@@ -71,7 +62,7 @@ public class GameManager : MonoBehaviour {
 
 	public IEnumerator StartGame() {
 		if (!gameRunning) {
-			Grid.TheGrid.HideAllButtons ();
+			GridManager.TheGrid.HideAllButtons ();
 			gameRunning = true;
 			paused = false;
 			curCastleHP = maxCastleHP;
@@ -93,18 +84,18 @@ public class GameManager : MonoBehaviour {
 	}
 
 	void Update() {
-		if (Input.GetKeyDown (KeyCode.P)) {
+        if (Input.GetKeyDown (KeyCode.P) && UIManager.Instance.State == GameStates.Play) {
 			paused = !paused;
 
 			if (paused) {
-				UIManager.Instance.SetGameState ("Pause");
-			}
+                EventManager.Instance.TriggerEvent("Pause");
+            } else {
+                EventManager.Instance.TriggerEvent("Unpause");
+            }
 		}
 
 		if (!paused) {
-			if (waveState == WaveState.Wave && EnemyManager.Instance.AllEnemiesKilled) {
-				EndWave ();
-			}
+            TimerManager.Instance.Update(Time.deltaTime);
 		}
 	}
 	public void StartWave() {
@@ -113,26 +104,28 @@ public class GameManager : MonoBehaviour {
 			waveState = WaveState.Wave;
 			msgBox.Text = "Wave " + waveNumber + " Start";
 			Invoke ("HideMessage", 2.0f);
-			Grid.TheGrid.StartWave ();
+			GridManager.TheGrid.StartWave ();
 			//TimerManager.Instance.AddTimer (new Timer (endWaveDelegate, 15 * (waveNumber + 1)));
 		}
 	}
 
 	void EndWave() {
-		Grid.TheGrid.HideAllButtons ();
+		GridManager.TheGrid.HideAllButtons ();
 		waveState = WaveState.EndWave;
 		msgBox.Text = "Wave Over";
 		Invoke ("HideMessage", 2.0f);
-		Grid.TheGrid.ClearRocks ();
-		Grid.TheGrid.ScatterRocks (Random.Range (1, Mathf.Min (waveNumber + 3, 6)) * 2);
-		Grid.TheGrid.EndWave ();
+		GridManager.TheGrid.ClearRocks ();
+		GridManager.TheGrid.ScatterRocks (Random.Range (1, Mathf.Min (waveNumber + 3, 6)) * 2);
+		GridManager.TheGrid.EndWave ();
 		wave.RollTide (waveNumber + 1);
-		TimerManager.Instance.AddTimer (new Timer (startSetupDelegate, 2));
+        Timer setupTimer = new Timer(2);
+        setupTimer.OnTick.AddListener(StartSetup);
+        setupTimer.Start();
 	}
 
 	void StartSetup() {
 		waveState = WaveState.SetUp;
-		Grid.TheGrid.SetClickState ("None");
+		GridManager.TheGrid.SetClickState ("None");
 		msgBox.Text = "Setup";
 
 		castleHealthDisplay.value = maxCastleHP;
@@ -143,8 +136,8 @@ public class GameManager : MonoBehaviour {
         if (waveNumber < maxWaves) {
 			waveText.text = "Wave " + waveNumber + " / " + maxWaves;
 			waveDisplay.value = waveNumber;
-			startWaveTimer = new Timer (startWaveDelegate, 15);
-			TimerManager.Instance.AddTimer (startWaveTimer);
+			
+            startWaveTimer.Stop();
 		} else {
 			won = true;
 			SceneManager.LoadScene ("GameOver");
@@ -183,8 +176,9 @@ public class GameManager : MonoBehaviour {
 	public void RestartGame() {
 		gameRunning = false;
 		Funds = startMoney;
-		Grid.TheGrid.Reset ();
-		UIManager.Instance.SetGameState ("Game");
+		GridManager.TheGrid.Reset ();
+        EventManager.Instance.TriggerEvent("Restart");
+		//UIManager.Instance.SetGameState ("Game");
 	}
 
 	public bool WonGame {
@@ -215,6 +209,12 @@ public class GameManager : MonoBehaviour {
 			return waveState;
 		}
 	}
+
+    public float Scale {
+        get {
+            return gameScale;
+        }
+    }
 }
 
 public enum WaveState {

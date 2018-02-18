@@ -8,23 +8,29 @@ public class Movement : MonoBehaviour {
 	public float speed;
 	public Vector3 fwd = new Vector3(0, 0, 1);
 	Vector3 lastTilePos;
-	List<Tile> path;
+	List<SandTile> path;
 	[SerializeField]
 	float atkTime = 1f;
 	int atkDamage = 1;
-	Tile tile;
-
+	SandTile tile;
+    Timer atkTimer;
     AudioSource audioSrc;
     
     void Awake()
     {
         audioSrc = GetComponent<AudioSource>();
         StartCoroutine(PlayWalkAudio());
+        atkTimer = new Timer(atkTime, true);
+        atkTimer.OnTick.AddListener(Attack);
+
     }
     
 	// Use this for initialization
 	void Start () {
 		lastTilePos = transform.position;
+        speed *= GameManager.Instance.Scale;
+		transform.localScale = transform.localScale.SetX(transform.localScale.x * GameManager.Instance.Scale);
+		transform.localScale = transform.localScale.SetZ(transform.localScale.z * GameManager.Instance.Scale);
     }
 
     IEnumerator PlayWalkAudio()
@@ -40,18 +46,15 @@ public class Movement : MonoBehaviour {
 		if (!GameManager.Instance.IsPaused) {
 			transform.position += fwd * speed * Time.deltaTime;
 
-			if (Vector3.Distance (lastTilePos, transform.position) >= 1) {
-				lastTilePos += fwd;
+            if (Vector3.Distance (lastTilePos, transform.position) >= GameManager.Instance.Scale) {
+                lastTilePos += fwd * GameManager.Instance.Scale;
 
 				if (path != null) {
 					if (path.IsEmpty ()) {
 						fwd = Vector3.zero;
-						WaitDelegate atkDelegate = () => {
-							Attack();
-						};
-						StartCoroutine(gameObject.RunAfterRepeating(atkDelegate, atkTime));
+                        atkTimer.Start();
 					} else if (!path [0].Occupied) {
-						Tile dest = path [0];
+						SandTile dest = path [0];
 						fwd = dest.transform.position - lastTilePos;
 						fwd.y = 0;
 						fwd.Normalize ();
@@ -63,8 +66,8 @@ public class Movement : MonoBehaviour {
 							tile.Occupant = gameObject;
 						}
 					} else {
-						path = Grid.TheGrid.CalcPathToCastle (lastTilePos);
-						Tile dest = path [0];
+						path = GridManager.TheGrid.CalcPathToCastle (lastTilePos);
+						SandTile dest = path [0];
 						fwd = dest.transform.position - lastTilePos;
 						fwd.y = 0;
 						fwd.Normalize ();
@@ -72,8 +75,8 @@ public class Movement : MonoBehaviour {
 						path.Remove (dest);
 					}
 				} else {
-					path = Grid.TheGrid.CalcPathToCastle (lastTilePos);
-					Tile dest = path [0];
+					path = GridManager.TheGrid.CalcPathToCastle (lastTilePos);
+					SandTile dest = path [0];
 					fwd = dest.transform.position - lastTilePos;
 					fwd.y = 0;
 					fwd.Normalize ();
@@ -89,7 +92,7 @@ public class Movement : MonoBehaviour {
 		List<Vector3> possibleFwds = new List<Vector3>();
 		Vector2 testFwd = new Vector2 (fwd.x, fwd.z);
 		for (int i = 0; i < 4; i++) {
-			Tile t = Grid.TheGrid.GetTileAt (lastTilePos + new Vector3(testFwd.x, 0, testFwd.y));
+			SandTile t = GridManager.TheGrid.GetTileAt (lastTilePos + new Vector3(testFwd.x, 0, testFwd.y));
 
 			if (t && !t.Occupied) {
 				possibleFwds.Add (testFwd);
@@ -116,5 +119,6 @@ public class Movement : MonoBehaviour {
 		if (tile != null) {
 			tile.Occupant = null;
 		}
+        atkTimer.Stop();
 	}
 }

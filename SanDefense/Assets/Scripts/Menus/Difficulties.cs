@@ -26,7 +26,7 @@ public class Difficulties : MonoBehaviour {
         //Reset the selected to be null
         if (selected != null)
         {
-			GetComponentInParent<UIManager> ().SetGameState ("Game");
+            EventManager.Instance.TriggerEvent("Start Game");
             selected = null;
         }
 

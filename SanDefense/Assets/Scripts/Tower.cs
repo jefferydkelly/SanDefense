@@ -83,6 +83,9 @@ public class Tower : MonoBehaviour
     void Start()
     {
         //initializing variables
+        transform.localScale = transform.localScale.SetX(transform.localScale.x * GameManager.Instance.Scale);
+		transform.localScale = transform.localScale.SetZ(transform.localScale.z * GameManager.Instance.Scale);
+		boxCollider = GetComponent<BoxCollider>();
         boxCollider = GetComponent<BoxCollider>();
         if (turretHead)
             head = turretHead.transform;
@@ -285,14 +288,14 @@ public class Tower : MonoBehaviour
     }
 
 	void OnDestroy() {
-		Grid.TheGrid.TowerDestroyed ();
+		GridManager.TheGrid.TowerDestroyed ();
 	}
 
     void OnMouseEnter()
     {
-		if ((Grid.TheGrid.ClickState == ClickStates.DestroyTurret || Grid.TheGrid.ClickState == ClickStates.UpgradeTurret)) {
-			Grid.TheGrid.SelectedTower = this;
-			textMesh.gameObject.SetActive (Grid.TheGrid.ClickState == ClickStates.UpgradeTurret);
+		if ((GridManager.TheGrid.ClickState == ClickStates.DestroyTurret || GridManager.TheGrid.ClickState == ClickStates.UpgradeTurret)) {
+			GridManager.TheGrid.SelectedTower = this;
+			textMesh.gameObject.SetActive (GridManager.TheGrid.ClickState == ClickStates.UpgradeTurret);
 		} else {
 			DisplayRange ();
 		}
@@ -300,19 +303,19 @@ public class Tower : MonoBehaviour
 
     void OnMouseExit()
     {
-		if ((Grid.TheGrid.ClickState == ClickStates.DestroyTurret || Grid.TheGrid.ClickState == ClickStates.UpgradeTurret)) {
+		if ((GridManager.TheGrid.ClickState == ClickStates.DestroyTurret || GridManager.TheGrid.ClickState == ClickStates.UpgradeTurret)) {
 			textMesh.gameObject.SetActive (false);
-			Grid.TheGrid.SelectedTower = null;
+			GridManager.TheGrid.SelectedTower = null;
 		} else {
 			StopDisplayRange ();
 		}
     }
 
 	void OnMouseUp() {
-		if (Grid.TheGrid.ClickState == ClickStates.DestroyTurret) {
-			Grid.TheGrid.DemolishTower ();
-		} else if (Grid.TheGrid.ClickState == ClickStates.UpgradeTurret) {
-			Grid.TheGrid.UpgradeTower ();
+		if (GridManager.TheGrid.ClickState == ClickStates.DestroyTurret) {
+			GridManager.TheGrid.DemolishTower ();
+		} else if (GridManager.TheGrid.ClickState == ClickStates.UpgradeTurret) {
+			GridManager.TheGrid.UpgradeTower ();
 			textMesh.gameObject.SetActive (false);
 		}
 	}
